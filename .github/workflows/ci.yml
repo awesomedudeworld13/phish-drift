@@ -34,15 +34,18 @@ jobs:
           key: phiusiil-v1
 
       # The construction audit is the project's headline and has no learned
-      # parameters, so it must reproduce exactly on every commit. If this number
-      # moves, either the corpus changed upstream or we broke the loader.
-      - name: Construction audit reproduces
+      # parameters, so it must reproduce exactly on every commit -- for BOTH
+      # corpora. The contrast between them is the result; if either number
+      # moves, either a corpus changed upstream or we broke a loader.
+      - name: Construction audit reproduces (both corpora)
         run: |
           python -m phishdrift.cli audit | tee audit.txt
-          grep -q "TSS         : 0.9897" audit.txt || {
-            echo "::error::Construction audit TSS changed; expected 0.9897"
-            exit 1
-          }
+          for expected in "0.9897" "0.1608"; do
+            grep -q "TSS         : $expected" audit.txt || {
+              echo "::error::Construction audit TSS $expected not found"
+              exit 1
+            }
+          done
 
       - name: Live snapshots are well formed
         run: |

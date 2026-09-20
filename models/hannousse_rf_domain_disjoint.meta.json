@@ -1,0 +1,90 @@
+{
+  "model_version": 1,
+  "trained_at_utc": "2026-09-20T19:18:31+00:00",
+  "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+  "python": "3.12.10",
+  "split_name": "domain_disjoint",
+  "split_sizes": {
+    "train": 8001,
+    "val": 1715,
+    "test": 1714,
+    "train_base_rate": 0.492688,
+    "test_base_rate": 0.572929
+  },
+  "estimator": "RandomForestClassifier",
+  "hyperparameters": {
+    "n_estimators": 300,
+    "max_depth": null,
+    "min_samples_leaf": 2,
+    "class_weight": "balanced_subsample",
+    "random_state": 20260920
+  },
+  "n_features": 52,
+  "thresholds": {
+    "f1": 0.469552,
+    "tss": 0.469552
+  },
+  "top_features": [
+    {
+      "name": "has_www",
+      "importance": 0.099698
+    },
+    {
+      "name": "subdomain_length",
+      "importance": 0.097481
+    },
+    {
+      "name": "digit_ratio",
+      "importance": 0.054094
+    },
+    {
+      "name": "suspicious_keyword_count",
+      "importance": 0.050394
+    },
+    {
+      "name": "path_length",
+      "importance": 0.04941
+    },
+    {
+      "name": "special_ratio",
+      "importance": 0.047997
+    },
+    {
+      "name": "entropy_url",
+      "importance": 0.046194
+    },
+    {
+      "name": "domain_length",
+      "importance": 0.045979
+    },
+    {
+      "name": "url_length",
+      "importance": 0.041273
+    },
+    {
+      "name": "n_subdomains",
+      "importance": 0.039373
+    },
+    {
+      "name": "letter_ratio",
+      "importance": 0.039209
+    },
+    {
+      "name": "n_slashes",
+      "importance": 0.038717
+    },
+    {
+      "name": "n_hyphens",
+      "importance": 0.03864
+    },
+    {
+      "name": "path_depth",
+      "importance": 0.035899
+    },
+    {
+      "name": "entropy_domain",
+      "importance": 0.032995
+    }
+  ],
+  "benchmark": "hannousse"
+}

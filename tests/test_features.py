@@ -25,7 +25,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from phishdrift import evaluate                                    # noqa: E402
 from phishdrift.benchmark import (                                 # noqa: E402
-    BENIGN_TEMPLATE, Split, domain_disjoint_split, random_split, template_audit,
+    BENCHMARKS, BENIGN_TEMPLATE, Split, domain_disjoint_split, random_split,
+    template_audit, verify_vendored,
 )
 from phishdrift.features import (                                  # noqa: E402
     FEATURE_NAMES, extract, feature_matrix, registrable_domain,
@@ -146,6 +147,53 @@ def test_benign_template_regex_boundaries():
     assert not BENIGN_TEMPLATE.match("https://a.com")         # no www
     assert not BENIGN_TEMPLATE.match("https://www.a.com/x")   # path
     assert not BENIGN_TEMPLATE.match("https://www.a.com?q=1") # query
+
+
+def test_vendored_corpora_match_their_published_hash():
+    """A committed corpus must still be the bytes its publisher advertises.
+
+    Vendoring buys reproducibility but introduces a silent failure mode: a
+    corrupted file, a bad merge, or a copy regenerated from a different
+    upstream version would change every published number with nothing visibly
+    wrong. This is the check that makes the committed copy trustworthy.
+    """
+    checked_any = False
+    for key in BENCHMARKS:
+        report = verify_vendored(key)
+        if not report["checked"]:
+            continue
+        checked_any = True
+        assert report["match"], (
+            f"{key}: vendored copy hash {report['actual'][:16]}... does not match "
+            f"published {report['expected'][:16]}..."
+        )
+    assert checked_any, "no vendored corpus was verified; expected at least one"
+
+
+def test_every_benchmark_normalises_labels_to_phishing_positive():
+    """Corpora disagree on label polarity; the loaders must not.
+
+    PhiUSIIL uses label==1 for legitimate, Hannousse a status string. Getting
+    this backwards for one corpus would invert its every metric while still
+    producing entirely plausible-looking numbers.
+    """
+    for key, source in BENCHMARKS.items():
+        assert source.key == key, f"registry key {key!r} != source.key {source.key!r}"
+        assert source._loader in vars(sys.modules["phishdrift.benchmark"]), \
+            f"{key}: loader {source._loader!r} not defined"
+        # A vendored corpus can be loaded offline, so assert on the real thing.
+        if source.vendored:
+            frame = source.load(Path("data"))
+            assert set(frame.columns) >= {"url", "y", "domain"}
+            assert frame.y.isin([0, 1]).all()
+            # Phishing URLs are longer than legitimate ones in every published
+            # phishing corpus; a polarity flip would reverse this.
+            phish_len = frame[frame.y == 1].url.str.len().mean()
+            legit_len = frame[frame.y == 0].url.str.len().mean()
+            assert phish_len > legit_len, (
+                f"{key}: phishing URLs ({phish_len:.0f} chars) are not longer than "
+                f"legitimate ({legit_len:.0f}); labels may be inverted"
+            )
 
 
 def test_tss_is_zero_for_constant_forecasts():

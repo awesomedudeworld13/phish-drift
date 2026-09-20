@@ -1,6 +1,11 @@
 {
-  "generated_at_utc": "2026-09-20T19:00:36+00:00",
+  "generated_at_utc": "2026-09-20T19:21:14+00:00",
   "bootstrap_resamples": 1000,
+  "benchmark": {
+    "key": "phiusiil",
+    "title": "PhiUSIIL Phishing URL Dataset",
+    "citation": "Prasad, A. & Chandra, S. (2024). PhiUSIIL: A diverse security profile empowered phishing URL detection framework. UCI Machine Learning Repository, id 967."
+  },
   "construction_audit": {
     "template_rule": {
       "n": 235795,
@@ -262,6 +267,11 @@
       "total": 0.995544
     }
   },
+  "attribution_applicable": {
+    "full_decomposition": true,
+    "benign_template_share": 1.0,
+    "reason": "This corpus's benign class matches the template in 100.0% of rows, so cell 3 holds its construction fixed while changing the era and the three-step attribution is valid."
+  },
   "attribution_steps": [
     {
       "step": "split_leakage",
@@ -442,8 +452,8 @@
   "models": {
     "random_split": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-20T18:52:00+00:00",
-      "git_commit": "unknown",
+      "trained_at_utc": "2026-09-20T19:17:55+00:00",
+      "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
       "python": "3.12.10",
       "split_name": "random",
       "split_sizes": {
@@ -527,12 +537,13 @@
           "name": "domain_longest_token",
           "importance": 0.00861
         }
-      ]
+      ],
+      "benchmark": "phiusiil"
     },
     "domain_disjoint": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-20T18:52:28+00:00",
-      "git_commit": "unknown",
+      "trained_at_utc": "2026-09-20T19:18:26+00:00",
+      "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
       "python": "3.12.10",
       "split_name": "domain_disjoint",
       "split_sizes": {
@@ -616,7 +627,8 @@
           "name": "n_hyphens",
           "importance": 0.007994
         }
-      ]
+      ],
+      "benchmark": "phiusiil"
     }
   },
   "live_corpus": {

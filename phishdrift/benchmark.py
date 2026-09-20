@@ -1,30 +1,42 @@
 """Benchmark corpus loading, split construction, and construction audits.
 
-We consume only the ``URL`` and ``label`` columns of PhiUSIIL. Its other 54
-columns are deliberately discarded for two reasons:
+Two public phishing-URL corpora are registered in ``BENCHMARKS``, and running
+both is what makes the project's central claim testable. A single collapsing
+benchmark shows only that *one* corpus is flawed; a second corpus, audited by
+exactly the same rule, distinguishes "this dataset is broken" from "the field
+is broken". In this case it came out the first way, which is the more useful
+result -- the healthy corpus becomes the control against which the genuine
+operational gap can be measured, with the construction artifact removed.
 
-* Roughly half (``LineOfCode``, ``HasTitle``, ``HasFavicon``, ``NoOfJS``,
+From every corpus we take **only the raw URL string and the label**, and
+recompute our own lexical features (``features.py``). Both corpora ship dozens
+of precomputed columns; we discard all of them, for two reasons:
+
+* Many (``LineOfCode``, ``HasTitle``, ``HasFavicon``, ``NoOfJS``,
   ``HasPasswordField``, ...) are derived from the *rendered page*. A URL pulled
   from a live phishing feed is typically dead within hours, so those features
   cannot be computed at operational time. Training on them would make the
   benchmark-versus-live comparison impossible by construction.
-* ``URLSimilarityIndex`` is computed relative to the dataset's own legitimate
-  set, so it encodes test-set membership. It is a leakage feature.
+* PhiUSIIL's ``URLSimilarityIndex`` is computed relative to that dataset's own
+  legitimate set, so it encodes test-set membership. It is a leakage feature.
 
-Recomputing our own lexical features from the raw URL (``features.py``) means
-benchmark rows and live rows traverse one identical code path.
+Recomputing from the raw URL also means the two corpora and the live feeds all
+traverse one identical code path, so a difference between them is a property of
+the data rather than of the pipeline.
 
 Label convention
 ----------------
-PhiUSIIL ships ``label == 1`` for *legitimate*. We invert it on load, so that
-throughout this project ``y == 1`` means **phishing** -- the positive class is
-the event being detected, matching the convention used for TSS, recall and
-precision everywhere else in the literature. ``load()`` is the only place this
-inversion happens.
+The corpora disagree: PhiUSIIL ships ``label == 1`` for *legitimate*, while
+Hannousse ships a ``status`` string. Each loader normalises to ``y == 1``
+meaning **phishing** -- the positive class is the event being detected, matching
+the convention used for TSS, recall and precision everywhere else. The per-corpus
+loader is the only place this normalisation happens.
 """
 
 from __future__ import annotations
 
+import gzip
+import hashlib
 import io
 import re
 import zipfile
@@ -36,42 +48,192 @@ import pandas as pd
 
 from .features import registrable_domain
 
-PHIUSIIL_URL = "https://archive.ics.uci.edu/static/public/967/phiusiil+phishing+url+dataset.zip"
-PHIUSIIL_MEMBER = "PhiUSIIL_Phishing_URL_Dataset.csv"
-
 # The string template that PhiUSIIL's legitimate class was evidently generated
-# from. Discovered by inspection, not fitted; see `template_audit`.
+# from. Discovered by inspection of PhiUSIIL, not fitted; see `template_audit`.
+# It is applied unchanged to every corpus, which is what makes the audit a
+# comparison rather than a bespoke accusation.
 BENIGN_TEMPLATE = re.compile(r"^https://www\.[^/?#]+/?$")
 
 
-def download(dest: Path) -> Path:
-    """Fetch the PhiUSIIL archive to ``dest`` unless it is already present."""
-    import requests
+@dataclass(frozen=True)
+class BenchmarkSource:
+    """A public phishing-URL corpus we can load as ``[url, y, domain]``.
 
-    dest = Path(dest)
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    if dest.exists() and dest.stat().st_size > 1_000_000:
+    Two corpora are registered, and the contrast between them is the point.
+    Running one benchmark can only show that *a* benchmark is flawed; running a
+    second, healthy one distinguishes "this corpus is broken" from "the field
+    is broken", and supplies a control on which the operational gap can be
+    measured without a construction artifact confounding it.
+    """
+
+    key: str
+    title: str
+    citation: str
+    url: str
+    filename: str
+    min_bytes: int
+    _loader: str                      # module-level function that parses it
+    licence: str = ""
+    sha256: str = ""                  # upstream-published hash, if any
+    vendored: str = ""                # repo-relative path to a committed copy
+
+    def resolve(self, dest_dir: Path) -> Path:
+        """Return a local path to the corpus, preferring a committed copy.
+
+        A vendored file is used when present because it makes the analysis
+        reproducible without a live third party: `data/benchmarks/` holds the
+        exact bytes every published number was computed from, verified against
+        the hash the publisher advertises. Vendoring is only done where the
+        licence permits redistribution.
+        """
+        if self.vendored:
+            path = Path(__file__).resolve().parent.parent / self.vendored
+            if path.exists():
+                return path
+        return self.download(dest_dir)
+
+    def download(self, dest_dir: Path) -> Path:
+        import requests
+
+        dest = Path(dest_dir) / self.filename
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if dest.exists() and dest.stat().st_size >= self.min_bytes:
+            return dest
+
+        # Mendeley rejects the default python-requests User-Agent with a 403,
+        # so every source is fetched under an identifying one. Downloading to a
+        # temporary path and renaming on success keeps a truncated or
+        # error-page response from being cached as if it were the dataset --
+        # which would then quietly train a model on HTML.
+        headers = {"User-Agent": (
+            "phish-drift/1.0 (science-fair research project; "
+            "benchmark evaluation; contact via GitHub issues)"
+        )}
+        tmp = dest.with_suffix(dest.suffix + ".part")
+        with requests.get(self.url, stream=True, timeout=300, headers=headers) as r:
+            r.raise_for_status()
+            with open(tmp, "wb") as fh:
+                for chunk in r.iter_content(1 << 20):
+                    fh.write(chunk)
+        if tmp.stat().st_size < self.min_bytes:
+            size = tmp.stat().st_size
+            tmp.unlink()
+            raise RuntimeError(
+                f"{self.key}: download was {size:,} bytes, expected at least "
+                f"{self.min_bytes:,}; the source may have moved or be rate-limiting"
+            )
+        tmp.replace(dest)
         return dest
-    with requests.get(PHIUSIIL_URL, stream=True, timeout=300) as r:
-        r.raise_for_status()
-        with open(dest, "wb") as fh:
-            for chunk in r.iter_content(1 << 20):
-                fh.write(chunk)
-    return dest
+
+    def load(self, dest_dir: Path) -> pd.DataFrame:
+        frame = globals()[self._loader](self.resolve(dest_dir))
+        frame["domain"] = [registrable_domain(u) for u in frame["url"]]
+        return frame.reset_index(drop=True)
 
 
-def load(archive: Path) -> pd.DataFrame:
-    """Load PhiUSIIL as ``[url, y, domain]`` with ``y == 1`` meaning phishing."""
-    with zipfile.ZipFile(archive) as z:
-        raw = pd.read_csv(io.BytesIO(z.read(PHIUSIIL_MEMBER)), usecols=["URL", "label"])
-
-    df = pd.DataFrame({
+def _load_phiusiil(path: Path) -> pd.DataFrame:
+    """PhiUSIIL ships ``label == 1`` for legitimate; we invert to y==1 phishing."""
+    with zipfile.ZipFile(path) as z:
+        raw = pd.read_csv(io.BytesIO(z.read("PhiUSIIL_Phishing_URL_Dataset.csv")),
+                          usecols=["URL", "label"])
+    return pd.DataFrame({
         "url": raw["URL"].astype(str),
-        # Inversion happens here and nowhere else. See module docstring.
         "y": (raw["label"] == 0).astype(np.int8),
     })
-    df["domain"] = [registrable_domain(u) for u in df["url"]]
-    return df
+
+
+def _load_hannousse(path: Path) -> pd.DataFrame:
+    """Hannousse & Yahiouche ship a ``status`` column of 'phishing'/'legitimate'.
+
+    Like PhiUSIIL, this corpus carries dozens of precomputed features we ignore
+    -- many of them page-derived and so uncomputable on live URLs. We take the
+    raw ``url`` column and recompute our own features, exactly as for PhiUSIIL,
+    so the two corpora remain comparable to each other and to live data.
+    """
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8", newline="") as fh:
+        raw = pd.read_csv(fh, usecols=["url", "status"])
+    return pd.DataFrame({
+        "url": raw["url"].astype(str),
+        "y": (raw["status"].str.strip().str.lower() == "phishing").astype(np.int8),
+    })
+
+
+BENCHMARKS: dict[str, BenchmarkSource] = {
+    "phiusiil": BenchmarkSource(
+        key="phiusiil",
+        title="PhiUSIIL Phishing URL Dataset",
+        citation=(
+            "Prasad, A. & Chandra, S. (2024). PhiUSIIL: A diverse security "
+            "profile empowered phishing URL detection framework. "
+            "UCI Machine Learning Repository, id 967."
+        ),
+        url="https://archive.ics.uci.edu/static/public/967/phiusiil+phishing+url+dataset.zip",
+        filename="phiusiil.zip",
+        min_bytes=1_000_000,
+        _loader="_load_phiusiil",
+    ),
+    "hannousse": BenchmarkSource(
+        key="hannousse",
+        title="Web page phishing detection (Hannousse & Yahiouche)",
+        citation=(
+            "Hannousse, A. & Yahiouche, S. (2021). Towards benchmark datasets "
+            "for machine learning based website phishing detection: An "
+            "experimental study. Engineering Applications of Artificial "
+            "Intelligence, 104. Mendeley Data, doi:10.17632/c2gw7fy2j4.3"
+        ),
+        url=(
+            "https://data.mendeley.com/public-files/datasets/c2gw7fy2j4/files/"
+            "575316f4-ee1d-453e-a04f-7b950915b61b/file_downloaded"
+        ),
+        filename="hannousse.csv",
+        min_bytes=1_000_000,
+        _loader="_load_hannousse",
+        licence="CC BY 4.0",
+        # Published by Mendeley Data for dataset_B_05_2020.csv. Our committed
+        # copy was verified against this before being added; `verify_vendored`
+        # re-checks it, and CI runs that check on every push.
+        sha256="21093e2902e5441c86a6daf95e86e7c332046e477fdf109a579d7bd81e586d6c",
+        # Mendeley sits behind bot protection that rejects the TLS fingerprint
+        # of Python's HTTP stack with a 403 while serving curl normally, so an
+        # unattended CI download is not dependable. CC BY 4.0 permits
+        # redistribution with attribution, so the exact bytes are committed.
+        vendored="data/benchmarks/hannousse_dataset_B_05_2020.csv.gz",
+    ),
+}
+
+
+def verify_vendored(key: str) -> dict:
+    """Check a committed corpus still matches the hash its publisher advertises.
+
+    Guards against the quiet failure modes of vendoring: a corrupted file, a
+    bad merge, or someone regenerating the copy from a different source
+    version. Returns a report rather than raising, so a caller can decide
+    whether a mismatch is fatal.
+    """
+    source = BENCHMARKS[key]
+    if not (source.vendored and source.sha256):
+        return {"key": key, "checked": False, "reason": "no vendored copy or no published hash"}
+
+    path = Path(__file__).resolve().parent.parent / source.vendored
+    if not path.exists():
+        return {"key": key, "checked": False, "reason": f"missing {source.vendored}"}
+
+    digest = hashlib.sha256()
+    with gzip.open(path, "rb") as fh:
+        for chunk in iter(lambda: fh.read(1 << 20), b""):
+            digest.update(chunk)
+    got = digest.hexdigest()
+    return {
+        "key": key,
+        "checked": True,
+        "expected": source.sha256,
+        "actual": got,
+        "match": got == source.sha256,
+        "licence": source.licence,
+    }
+
+DEFAULT_BENCHMARK = "phiusiil"
 
 
 # --------------------------------------------------------------------------
