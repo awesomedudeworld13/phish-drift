@@ -1,0 +1,15 @@
+# Trained forests are ~15 MB each and are regenerated deterministically from a
+# fixed seed by `cli.py train`, so they are rebuilt rather than versioned.
+models/*.joblib
+
+# Upstream archive, re-downloadable from UCI and cached in CI.
+data/phiusiil.zip
+data/cache/
+
+.venv/
+__pycache__/
+*.py[cod]
+*.log
+audit.txt
+.pytest_cache/
+.DS_Store

@@ -1,0 +1,70 @@
+name: collect
+
+# One immutable snapshot per UTC day, appended to data/live/.
+#
+# This job is deliberately small and does not train or score anything. The
+# prospective record's value comes from being uninterrupted, so the daily job
+# has as few ways to fail as possible. Scoring happens in report.yml.
+#
+# 06:20 UTC is chosen to sit after OpenPhish's overnight feed rotation and away
+# from the top of the hour, when GitHub's scheduler is most congested and
+# cron-triggered runs are most likely to be delayed or dropped.
+
+on:
+  schedule:
+    - cron: "20 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install --quiet -r requirements.txt
+
+      # The Tranco list is ~25 MB and changes slowly; caching it keeps us from
+      # re-downloading a million rows every morning.
+      - name: Restore Tranco cache
+        uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: tranco-${{ github.run_id }}
+          restore-keys: tranco-
+
+      - name: Collect snapshot
+        run: python -m phishdrift.cli collect --benign 300
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/live
+          if git diff --cached --quiet; then
+            echo "No new snapshot (already collected today)."
+            exit 0
+          fi
+          git commit -m "data: live snapshot $(date -u +%F)"
+          # A concurrent report.yml commit is the expected conflict here; rebase
+          # and retry rather than force-pushing over its results.
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && \
+              git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            echo "push attempt $attempt failed; retrying"
+            sleep 5
+          done
+          exit 1
