@@ -222,11 +222,13 @@ def run(benchmark: pd.DataFrame,
         model_random: TrainedModel,
         model_disjoint: TrainedModel,
         live: pd.DataFrame,
-        n_resamples: int = BOOTSTRAP_RESAMPLES) -> dict:
+        n_resamples: int = BOOTSTRAP_RESAMPLES,
+        benchmark_meta: dict | None = None) -> dict:
     """Execute all four cells plus the audits, and return the results document."""
     results: dict = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "bootstrap_resamples": n_resamples,
+        "benchmark": benchmark_meta or {},
     }
 
     # -- Audit A: what the benchmark hands you for free -------------------
@@ -310,19 +312,57 @@ def run(benchmark: pd.DataFrame,
          "string template. Skill lost here was never phishing detection at all."),
     ]
 
+    # Cell 3 only means "hold construction fixed while the era changes" for a
+    # corpus whose benign class IS the template. Where it is not -- Hannousse's
+    # benign URLs carry paths, http and no www -- rendering live benign URLs as
+    # `https://www.<domain>` *changes* the construction instead of holding it,
+    # and the middle two steps stop measuring what their names say. The total
+    # gap (cell 1 -> cell 4) remains valid in every case, because it never
+    # depends on cell 3.
+    benign_template_share = audit.benign_template_share
+    decomposable = benign_template_share >= 0.90
+
     attribution = {}
     for point_name in ("f1", "tss"):
         rows = {}
-        for key, a, b in ((s[0], s[1], s[2]) for s in steps):
-            if a in cells and b in cells:
-                rows[key] = round(cells[a].tss(point_name) - cells[b].tss(point_name), 6)
+        if decomposable:
+            for key, a, b in ((s[0], s[1], s[2]) for s in steps):
+                if a in cells and b in cells:
+                    rows[key] = round(cells[a].tss(point_name) - cells[b].tss(point_name), 6)
+        elif "cell1_benchmark_random" in cells and "cell2_benchmark_disjoint" in cells:
+            # Split leakage compares two partitions of one corpus and never
+            # touches cell 3, so it survives even when the rest does not.
+            rows["split_leakage"] = round(
+                cells["cell1_benchmark_random"].tss(point_name)
+                - cells["cell2_benchmark_disjoint"].tss(point_name), 6
+            )
         if "cell1_benchmark_random" in cells and "cell4_live_realistic_benign" in cells:
             rows["total"] = round(
                 cells["cell1_benchmark_random"].tss(point_name)
                 - cells["cell4_live_realistic_benign"].tss(point_name), 6
             )
         attribution[point_name] = rows
+
     results["attribution_tss"] = attribution
+    results["attribution_applicable"] = {
+        "full_decomposition": bool(decomposable),
+        "benign_template_share": round(benign_template_share, 6),
+        "reason": (
+            "This corpus's benign class matches the template in "
+            f"{benign_template_share:.1%} of rows, so cell 3 holds its construction "
+            "fixed while changing the era and the three-step attribution is valid."
+            if decomposable else
+            "This corpus's benign class matches the template in only "
+            f"{benign_template_share:.1%} of rows, so cell 3 does NOT hold its "
+            "construction fixed -- for this corpus, rendering live benign URLs in "
+            "template form is itself a change of construction. The middle two steps "
+            "would not measure what their names claim and are withheld. Split "
+            "leakage (cells 1 vs 2) and the total gap (cells 1 vs 4) are reported "
+            "because neither depends on cell 3. Cell 3 is still shown as a "
+            "diagnostic: it reports how the model behaves on template-shaped benign "
+            "URLs, which is informative but is not a step in a decomposition."
+        ),
+    }
     results["attribution_steps"] = [
         {"step": s[0], "from": s[1], "to": s[2], "meaning": s[3]} for s in steps
     ]
@@ -413,25 +453,107 @@ def run(benchmark: pd.DataFrame,
     return results
 
 
-def write(results: dict, json_path: Path, markdown_path: Path) -> None:
-    Path(json_path).parent.mkdir(parents=True, exist_ok=True)
-    Path(json_path).write_text(json.dumps(results, indent=2), encoding="utf-8")
-    Path(markdown_path).write_text(render_markdown(results), encoding="utf-8")
+def combine(by_key: dict[str, dict]) -> dict:
+    """Merge per-benchmark result documents into the published document.
+
+    The cross-benchmark comparison is computed here rather than in ``run``
+    because it is the part that cannot be derived from a single corpus, and it
+    is the part that decides what the project is entitled to claim. One
+    benchmark collapsing shows that *a* benchmark is flawed. A second benchmark
+    behaving differently is what separates "this corpus is broken" from "the
+    field is broken" -- and, in the direction it actually came out, supplies a
+    healthy control on which the operational gap can be measured without a
+    construction artifact confounding it.
+    """
+    comparison = []
+    for key, r in by_key.items():
+        ta = r["construction_audit"]["template_rule"]
+        rates = r["construction_audit"]["structural_rates"]
+        degenerate = [p for p, v in rates.items() if v["benign"] in (0.0, 1.0)]
+        cells = r.get("cells", {})
+        attr = (r.get("attribution_tss") or {}).get("tss", {})
+        comparison.append({
+            "key": key,
+            "title": r.get("benchmark", {}).get("title", key),
+            "n": ta["n"],
+            "template_rule_tss": ta["tss"],
+            "benign_template_share": ta["benign_template_share"],
+            "degenerate_properties": degenerate,
+            "cell1_tss": cells.get("cell1_benchmark_random", {})
+                              .get("operating_points", {}).get("tss", {}).get("tss"),
+            "cell4_tss": cells.get("cell4_live_realistic_benign", {})
+                              .get("operating_points", {}).get("tss", {}).get("tss"),
+            "total_gap": attr.get("total"),
+            "split_leakage": attr.get("split_leakage"),
+            "decomposable": r.get("attribution_applicable", {}).get("full_decomposition"),
+            "construction_share": (
+                round(attr["benign_construction_artifact"] / attr["total"], 6)
+                if attr.get("total") and "benign_construction_artifact" in attr else None
+            ),
+        })
+    comparison.sort(key=lambda c: c["template_rule_tss"], reverse=True)
+
+    return {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "benchmarks": by_key,
+        "comparison": comparison,
+    }
 
 
 def _fmt(x) -> str:
     return "—" if x is None or (isinstance(x, float) and np.isnan(x)) else f"{x:.3f}"
 
 
-def render_markdown(r: dict) -> str:
-    """Render RESULTS.md. Generated, never hand-edited."""
+def render_markdown(document: dict) -> str:
+    """Render RESULTS.md from a combined document. Generated, never hand-edited."""
     out: list[str] = []
     a = out.append
 
     a("# phish-drift — Results\n")
     a("> Auto-generated by `python -m phishdrift.cli report`. Do not hand-edit.\n")
-    a(f"Generated {r['generated_at_utc']} · "
-      f"{r['bootstrap_resamples']} domain-clustered bootstrap resamples.\n")
+    a(f"Generated {document['generated_at_utc']}.\n")
+
+    comp = document.get("comparison", [])
+    if len(comp) > 1:
+        a("## Cross-benchmark comparison\n")
+        a("Two public phishing-URL corpora, one identical pipeline. The "
+          "zero-parameter template rule is applied unchanged to both, which is "
+          "what makes this a comparison rather than a bespoke accusation.\n")
+        a("| corpus | n | template-rule TSS | benign matching template | degenerate properties | benchmark TSS | live TSS | total gap |")
+        a("|---|---|---|---|---|---|---|---|")
+        for c in comp:
+            deg = ", ".join(f"`{d}`" for d in c["degenerate_properties"]) or "none"
+            a(f"| {c['title']} | {c['n']:,} | **{c['template_rule_tss']:.4f}** | "
+              f"{c['benign_template_share']:.4f} | {deg} | {_fmt(c['cell1_tss'])} | "
+              f"**{_fmt(c['cell4_tss'])}** | {_fmt(c['total_gap'])} |")
+        a("")
+        a("*A corpus whose benign class can be identified by a regular expression "
+          "is not measuring phishing detection. A corpus where the same rule is "
+          "near-worthless is measuring something real, and is the control against "
+          "which the operational gap should be read.*\n")
+        a("Reading the two together: the broken corpus loses **everything** and the "
+          "loss is almost entirely its construction, while the healthy corpus loses "
+          "roughly half and retains genuine operational skill. That difference is the "
+          "result — 'benchmarks overstate' is not a uniform property of the field but "
+          "something that varies enormously with how a corpus was assembled, and the "
+          "template rule detects which kind you are holding before you train anything.\n")
+
+    for key, r in document["benchmarks"].items():
+        title = r.get("benchmark", {}).get("title", key)
+        a(f"\n---\n\n# {title}\n")
+        citation = r.get("benchmark", {}).get("citation")
+        if citation:
+            a(f"> {citation}\n")
+        a(f"{r['bootstrap_resamples']} domain-clustered bootstrap resamples.\n")
+        out.extend(_render_one(r))
+
+    return "\n".join(out) + "\n"
+
+
+def _render_one(r: dict) -> list[str]:
+    """Per-benchmark detail sections."""
+    out: list[str] = []
+    a = out.append
 
     # 1. Construction audit
     ta = r["construction_audit"]["template_rule"]
@@ -472,7 +594,15 @@ def render_markdown(r: dict) -> str:
 
     # 3. Attribution
     a("## 3. Where the skill went\n")
-    a("Each step changes exactly one thing, so the drop is attributed, not just observed.\n")
+    applicable = r.get("attribution_applicable", {})
+    full = applicable.get("full_decomposition", True)
+
+    if full:
+        a("Each step changes exactly one thing, so the drop is attributed, not just observed.\n")
+    else:
+        a(f"⚠️ **Full decomposition withheld for this corpus.** "
+          f"{applicable.get('reason', '')}\n")
+
     a("| step | ΔTSS @ F1 point | ΔTSS @ TSS point |")
     a("|---|---|---|")
     f1a = r["attribution_tss"].get("f1", {})
@@ -484,9 +614,11 @@ def render_markdown(r: dict) -> str:
     if "total" in tsa:
         a(f"| **total** | **{_fmt(f1a.get('total'))}** | **{_fmt(tsa.get('total'))}** |")
     a("")
-    for step in r["attribution_steps"]:
-        a(f"- **{step['step'].replace('_', ' ')}** ({step['from']} → {step['to']}): {step['meaning']}")
-    a("")
+    if full:
+        for step in r["attribution_steps"]:
+            a(f"- **{step['step'].replace('_', ' ')}** ({step['from']} → {step['to']}): "
+              f"{step['meaning']}")
+        a("")
     if "total_gap_ci95" in r:
         g = r["total_gap_ci95"]
         a(f"Total gap at the TSS operating point: **{g['point_estimate']:.3f}** "
@@ -551,4 +683,4 @@ def render_markdown(r: dict) -> str:
             a(f"| {k} | {v:,} |")
         a("")
 
-    return "\n".join(out) + "\n"
+    return out

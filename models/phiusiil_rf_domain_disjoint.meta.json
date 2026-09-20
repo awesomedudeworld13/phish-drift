@@ -1,7 +1,7 @@
 {
   "model_version": 1,
-  "trained_at_utc": "2026-09-20T18:52:28+00:00",
-  "git_commit": "unknown",
+  "trained_at_utc": "2026-09-20T19:18:26+00:00",
+  "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
   "python": "3.12.10",
   "split_name": "domain_disjoint",
   "split_sizes": {
@@ -85,5 +85,6 @@
       "name": "n_hyphens",
       "importance": 0.007994
     }
-  ]
+  ],
+  "benchmark": "phiusiil"
 }

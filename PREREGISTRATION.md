@@ -138,3 +138,88 @@ Empty entries are pending, not omitted.*
 filled in no earlier than **2026-12-15**, giving roughly three months of daily
 collection. The date is committed here so the analysis cannot be stopped at a
 moment that happens to look favourable.
+
+---
+
+# Addendum — 2026-09-20: second benchmark
+
+**This is an addition, not a revision.** Nothing above has been edited. It is
+recorded separately because of when it happened, which changes what it is worth.
+
+## Disclosure of ordering
+
+The second corpus was added **after** the PhiUSIIL results in H1–H2 were
+observed. It is therefore **not a pre-registered prediction** and must not be
+presented as one. The motivation was a specific weakness in the original design,
+raised as a limitation in the first version of the README: a single corpus can
+only show that *one* dataset is flawed, and cannot distinguish that from the
+field being uniformly flawed. Only a second corpus separates those.
+
+We state the ordering plainly because the finding it produced happens to be
+favourable to the project's framing, and a reader is entitled to discount it
+accordingly.
+
+## What was fixed in place
+
+- **Corpus:** Hannousse, A. & Yahiouche, S. (2021), *Web page phishing
+  detection*, Mendeley Data doi:10.17632/c2gw7fy2j4.3, `dataset_B_05_2020.csv`,
+  11,430 URLs, balanced 50/50. CC BY 4.0.
+- **Committed bytes.** The copy in `data/benchmarks/` was verified against the
+  SHA-256 Mendeley publishes (`21093e29…`) before being added, and CI re-checks
+  it on every push. The corpus cannot be silently swapped for a more favourable
+  version.
+- **The audit rule is not re-tuned.** `BENIGN_TEMPLATE` was derived by
+  inspecting PhiUSIIL and is applied to Hannousse **unchanged**. Fitting a
+  bespoke rule per corpus would make the cross-corpus comparison meaningless,
+  and would guarantee a high score on any dataset by construction.
+- **Everything else is held constant**: the same 52 features, the same seed
+  (20260920), the same splits, the same frozen-threshold discipline, the same
+  live snapshots.
+
+## Registered before running the cells
+
+These *were* written down before the four-cell report was run on Hannousse
+(the audit in A1 had already been computed; the live cells had not):
+
+**A1 — Not all corpora are degenerate.** The template rule will score
+**below TSS 0.50** on Hannousse.
+> *Observed before the cells were run: **0.1608**, with no surface property
+> degenerate on either side. **HELD**.*
+
+**A2 — The healthy corpus retains operational skill.** Hannousse's live TSS
+(cell 4) will be **above 0.15**, versus PhiUSIIL's 0.000.
+
+**A3 — Split leakage is larger where the construction artifact is smaller.**
+PhiUSIIL's cells 1→2 step is 0.0001 because surface form swamps everything
+else; on a corpus without that shortcut, domain memorisation should become
+visible, and the step will exceed **0.02**.
+
+## Correction to the published method
+
+Running the second corpus exposed an error in the original decomposition, which
+is recorded here rather than quietly patched.
+
+Cell 3 was defined as "live feeds, benign held in the benchmark's own surface
+form", and the three-step attribution assumes that. That assumption is only true
+for a corpus whose benign class *is* the template. Hannousse's is not, so for it
+cell 3 *changes* construction rather than holding it — and its cell 3 duly came
+out above its cell 2, which would have published a nonsensical negative "drift"
+step had it been reported as one.
+
+`gap.py` now computes each corpus's `benign_template_share` and publishes the
+full three-step attribution only when that share is ≥ 0.90, withholding the
+middle two steps otherwise with a stated reason. Split leakage and the total gap
+are unaffected, as neither depends on cell 3. The guard is data-driven, not
+hard-coded per dataset, so a future corpus is handled on its measured properties.
+
+## Verdicts — addendum
+
+| Hypothesis | Predicted | Observed | Verdict |
+|---|---|---|---|
+| A1 template rule < 0.50 on a second corpus | < 0.50 | 0.1608 | **HELD** |
+| A2 healthy corpus live TSS > 0.15 | > 0.15 | 0.298 | **HELD** |
+| A3 split leakage > 0.02 there | > 0.02 | 0.088 | **HELD** |
+
+All three are single-corpus observations at n = 11,430 with live cells resting
+on one daily snapshot (n = 568). They are reported now and re-scored at the
+2026-12-15 date committed above.
