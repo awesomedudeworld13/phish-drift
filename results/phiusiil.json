@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-09-20T19:21:14+00:00",
-  "bootstrap_resamples": 1000,
+  "generated_at_utc": "2026-09-20T19:40:42+00:00",
+  "bootstrap_resamples": 600,
   "benchmark": {
     "key": "phiusiil",
     "title": "PhiUSIIL Phishing URL Dataset",
@@ -26,19 +26,27 @@
     "structural_rates": {
       "is_https": {
         "benign": 1.0,
-        "phishing": 0.487354
+        "phishing": 0.487354,
+        "separation": 0.512646,
+        "verdict": "degenerate"
       },
       "has_www": {
         "benign": 1.0,
-        "phishing": 0.413532
+        "phishing": 0.413532,
+        "separation": 0.586468,
+        "verdict": "degenerate"
       },
       "has_path": {
         "benign": 0.0,
-        "phishing": 0.27194
+        "phishing": 0.27194,
+        "separation": 0.27194,
+        "verdict": "degenerate"
       },
       "has_query": {
         "benign": 0.0,
-        "phishing": 0.060221
+        "phishing": 0.060221,
+        "separation": 0.060221,
+        "verdict": "degenerate"
       }
     },
     "note": "The template rule has zero learned parameters and needs no split. If its TSS is comparable to published machine-learning results on this corpus, those results are not evidence of phishing-detection skill."
@@ -69,8 +77,8 @@
           "brier": 0.002015,
           "brier_skill": 0.99177,
           "tss_ci95": [
-            0.994163,
-            0.99668
+            0.994131,
+            0.99672
           ]
         },
         "tss": {
@@ -90,8 +98,8 @@
           "brier": 0.002015,
           "brier_skill": 0.99177,
           "tss_ci95": [
-            0.994163,
-            0.99668
+            0.994131,
+            0.99672
           ]
         }
       }
@@ -121,8 +129,8 @@
           "brier": 0.002022,
           "brier_skill": 0.991756,
           "tss_ci95": [
-            0.993148,
-            0.996833
+            0.993174,
+            0.996805
           ]
         },
         "tss": {
@@ -142,8 +150,8 @@
           "brier": 0.002022,
           "brier_skill": 0.991756,
           "tss_ci95": [
-            0.993148,
-            0.996833
+            0.993174,
+            0.996805
           ]
         }
       }
@@ -173,8 +181,8 @@
           "brier": 0.003396,
           "brier_skill": 0.986416,
           "tss_ci95": [
-            0.972971,
-            0.996816
+            0.972578,
+            0.996785
           ]
         },
         "tss": {
@@ -194,8 +202,8 @@
           "brier": 0.003396,
           "brier_skill": 0.986416,
           "tss_ci95": [
-            0.972971,
-            0.996816
+            0.972578,
+            0.996785
           ]
         }
       }
@@ -296,8 +304,8 @@
     "operating_point": "tss",
     "point_estimate": 0.995544,
     "ci95": [
-      0.994048,
-      0.996673
+      0.993995,
+      0.996706
     ],
     "excludes_zero": true
   },
@@ -395,6 +403,22 @@
     "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
     "verdict": "BREACHED: 0.529 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 92.2% of BENIGN URLs carry a path against 61.7% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.529 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
   },
+  "live_training": {
+    "readiness": {
+      "ready": false,
+      "reason": "1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
+      "n_days": 1,
+      "n_rows": 568,
+      "days_needed": 13,
+      "thresholds": {
+        "min_train_days": 10,
+        "min_holdout_days": 4,
+        "min_rows_per_side": 400,
+        "min_positives_per_side": 100
+      }
+    },
+    "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+  },
   "robustness": {
     "urlhaus_malware": {
       "name": "robustness_urlhaus_malware",
@@ -452,8 +476,8 @@
   "models": {
     "random_split": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-20T19:17:55+00:00",
-      "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+      "trained_at_utc": "2026-09-20T19:34:03+00:00",
+      "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
       "python": "3.12.10",
       "split_name": "random",
       "split_sizes": {
@@ -542,8 +566,8 @@
     },
     "domain_disjoint": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-20T19:18:26+00:00",
-      "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+      "trained_at_utc": "2026-09-20T19:34:43+00:00",
+      "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
       "python": "3.12.10",
       "split_name": "domain_disjoint",
       "split_sizes": {

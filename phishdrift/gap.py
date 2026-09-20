@@ -33,6 +33,12 @@ headline. The cells have genuinely different base rates (the benchmark is 43%
 phishing; a live sample is whatever the feeds yield that day) and any
 base-rate-sensitive metric would confound that difference with the effects
 above. Base rates are printed for every cell regardless.
+
+Scope: this module answers *how large* the gap is and *what causes it*. It
+cannot answer whether the gap would close given live training data, because
+every model in the four cells was fitted on the benchmark. That second question
+-- the training-source x test-set 2x2 against a model fitted on live snapshots
+alone -- lives in ``livetrain.py`` and is reported as section 5.
 """
 
 from __future__ import annotations
@@ -418,6 +424,22 @@ def run(benchmark: pd.DataFrame,
         if len(live_headline[live_headline.y == 0]):
             results["sampling_confound"] = sampling_confound_diagnostic(live_headline)
 
+    # -- Question 2: does training on live data close the gap? --------------
+    # The four cells above quantify the gap. They cannot say whether it is a
+    # training-data problem, because every model in them was fitted on the
+    # benchmark. This runs the training-source x test-set 2x2 against a model
+    # fitted on live snapshots alone. Until the live record is long enough for
+    # a temporal split, it returns the question with what is still missing,
+    # which is reported rather than omitted.
+    from . import livetrain
+
+    results["live_training"] = livetrain.run_2x2(
+        benchmark_model=model_disjoint,
+        benchmark_test=disjoint_split_obj.test,
+        live=live,
+        n_resamples=n_resamples,
+    )
+
     # -- Robustness: the adjacent task, scored separately -------------------
     # URLhaus is malware distribution rather than phishing. If the operational
     # collapse is a property of the benchmark's construction rather than of one
@@ -465,11 +487,16 @@ def combine(by_key: dict[str, dict]) -> dict:
     healthy control on which the operational gap can be measured without a
     construction artifact confounding it.
     """
+    from .benchmark import (
+        constant_properties, degenerate_properties, max_single_property_tss,
+    )
+
     comparison = []
     for key, r in by_key.items():
         ta = r["construction_audit"]["template_rule"]
         rates = r["construction_audit"]["structural_rates"]
-        degenerate = [p for p, v in rates.items() if v["benign"] in (0.0, 1.0)]
+        degenerate = degenerate_properties(rates)
+        constant = constant_properties(rates)
         cells = r.get("cells", {})
         attr = (r.get("attribution_tss") or {}).get("tss", {})
         comparison.append({
@@ -479,6 +506,12 @@ def combine(by_key: dict[str, dict]) -> dict:
             "template_rule_tss": ta["tss"],
             "benign_template_share": ta["benign_template_share"],
             "degenerate_properties": degenerate,
+            "constant_properties": constant,
+            # The strongest single-boolean baseline. Reported alongside the
+            # template rule because the two catch different pathologies: a
+            # corpus can pass the template audit while one property alone
+            # solves it, which is exactly what Kaitholikkal does.
+            "max_single_property_tss": max_single_property_tss(rates),
             "cell1_tss": cells.get("cell1_benchmark_random", {})
                               .get("operating_points", {}).get("tss", {}).get("tss"),
             "cell4_tss": cells.get("cell4_live_realistic_benign", {})
@@ -491,7 +524,12 @@ def combine(by_key: dict[str, dict]) -> dict:
                 if attr.get("total") and "benign_construction_artifact" in attr else None
             ),
         })
-    comparison.sort(key=lambda c: c["template_rule_tss"], reverse=True)
+    # Rank by the worse of the two zero-parameter baselines, so a corpus that
+    # passes one audit and fails the other still sorts to the top.
+    comparison.sort(
+        key=lambda c: max(c["template_rule_tss"], c["max_single_property_tss"]),
+        reverse=True,
+    )
 
     return {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
@@ -519,24 +557,42 @@ def render_markdown(document: dict) -> str:
         a("Two public phishing-URL corpora, one identical pipeline. The "
           "zero-parameter template rule is applied unchanged to both, which is "
           "what makes this a comparison rather than a bespoke accusation.\n")
-        a("| corpus | n | template-rule TSS | benign matching template | degenerate properties | benchmark TSS | live TSS | total gap |")
-        a("|---|---|---|---|---|---|---|---|")
+        a("Two zero-parameter baselines are reported because they catch different "
+          "construction pathologies, and a corpus can pass one while failing the "
+          "other:\n")
+        a("- **template rule** — the conjunction `^https://www\\.[^/?#]+/?$`. High "
+          "when *no* benign row deviates, so combining several surface properties "
+          "identifies the benign class with perfect precision.")
+        a("- **best single property** — the largest "
+          "`|P(prop|benign) − P(prop|phishing)|`, which is exactly the TSS of that "
+          "one boolean used as the whole classifier. High when one property alone "
+          "nearly solves the corpus, with no conjunction and no exact extreme "
+          "needed.\n")
+        a("| corpus | n | template rule | best single property | degenerate | constant | benchmark TSS | live TSS | total gap |")
+        a("|---|---|---|---|---|---|---|---|---|")
         for c in comp:
-            deg = ", ".join(f"`{d}`" for d in c["degenerate_properties"]) or "none"
+            deg = ", ".join(f"`{d}`" for d in c["degenerate_properties"]) or "—"
+            con = ", ".join(f"`{d}`" for d in c["constant_properties"]) or "—"
             a(f"| {c['title']} | {c['n']:,} | **{c['template_rule_tss']:.4f}** | "
-              f"{c['benign_template_share']:.4f} | {deg} | {_fmt(c['cell1_tss'])} | "
-              f"**{_fmt(c['cell4_tss'])}** | {_fmt(c['total_gap'])} |")
+              f"**{c['max_single_property_tss']:.4f}** | {deg} | {con} | "
+              f"{_fmt(c['cell1_tss'])} | **{_fmt(c['cell4_tss'])}** | "
+              f"{_fmt(c['total_gap'])} |")
         a("")
-        a("*A corpus whose benign class can be identified by a regular expression "
-          "is not measuring phishing detection. A corpus where the same rule is "
-          "near-worthless is measuring something real, and is the control against "
-          "which the operational gap should be read.*\n")
-        a("Reading the two together: the broken corpus loses **everything** and the "
-          "loss is almost entirely its construction, while the healthy corpus loses "
-          "roughly half and retains genuine operational skill. That difference is the "
-          "result — 'benchmarks overstate' is not a uniform property of the field but "
-          "something that varies enormously with how a corpus was assembled, and the "
-          "template rule detects which kind you are holding before you train anything.\n")
+        a("*A corpus solved by a regular expression or by a single boolean is not "
+          "measuring phishing detection. One where both baselines are near-worthless "
+          "is measuring something real, and is the control against which the "
+          "operational gap should be read.*\n")
+        a("**Neither baseline alone is sufficient.** The template rule scores 0.9897 "
+          "on PhiUSIIL but only 0.1357 on Kaitholikkal — which would clear the latter "
+          "entirely, while a single boolean (`is_https`, 0.9999 benign vs 0.0621 "
+          "phishing) solves it at 0.9378. Conversely the highest single-property "
+          "score on PhiUSIIL is just 0.5865; its pathology only appears in the "
+          "conjunction. A corpus audit has to run both.\n")
+        a("Read across the corpora, the result is not 'benchmarks overstate "
+          "performance'. It is that the benchmark-to-operational gap varies "
+          "enormously with how a corpus was assembled — from total collapse to a "
+          "survivable halving — and that cheap, zero-parameter, label-free checks "
+          "predict which kind you are holding before any model is trained.\n")
 
     for key, r in document["benchmarks"].items():
         title = r.get("benchmark", {}).get("title", key)
@@ -636,9 +692,59 @@ def _render_one(r: dict) -> list[str]:
       "live data. The size of that collapse is the clearest available measure of "
       "how much of the benchmark is construction rather than task.*\n")
 
+    # 4b. Does live training close the gap?
+    lt = r.get("live_training")
+    if lt:
+        a("## 5. Does training on live data close the gap?\n")
+        if not lt["readiness"]["ready"]:
+            a(f"**Open — not yet answerable.** {lt['readiness']['reason']}.\n")
+            rd = lt["readiness"]
+            a(f"Collected so far: {rd['n_days']} day(s), {rd['n_rows']:,} headline rows. "
+              f"A temporal split needs {rd['thresholds']['min_train_days']} training days "
+              f"and {rd['thresholds']['min_holdout_days']} holdout days, with at least "
+              f"{rd['thresholds']['min_rows_per_side']:,} rows and "
+              f"{rd['thresholds']['min_positives_per_side']} phishing rows on each side."
+              + (f" **{rd['days_needed']} more day(s) of collection required.**"
+                 if rd.get("days_needed") else ""))
+            a("")
+            a("*This question is structural, not optional: the four cells above measure "
+              "the size of the gap, but every model in them was fitted on the benchmark, "
+              "so they cannot say whether more live training data would close it. The "
+              "2x2 below fills in automatically as the daily record accumulates.*\n")
+            a("| | benchmark test | live holdout |")
+            a("|---|---|---|")
+            a("| benchmark-trained | A | B |")
+            a("| live-trained | C | D |")
+            a("")
+            a("*A − B is the gap. D − B is how much live training recovers. C is the "
+              "control: a live-trained model that also scores well on the benchmark has "
+              "learned something general rather than this month's campaigns.*\n")
+        else:
+            a(f"{lt['answer']}\n")
+            a("| training source | benchmark test | live holdout |")
+            a("|---|---|---|")
+            c = lt["cells"]
+            a(f"| benchmark-trained | {c['A_benchmark_trained_on_benchmark']['tss']:.3f} "
+              f"| {c['B_benchmark_trained_on_live']['tss']:.3f} |")
+            a(f"| live-trained | {c['C_live_trained_on_benchmark']['tss']:.3f} "
+              f"| **{c['D_live_trained_on_live']['tss']:.3f}** |")
+            a("")
+            a(f"- Gap (A − B): **{lt['gap_A_minus_B']:.3f}**")
+            a(f"- Recovery from live training (D − B): **{lt['recovery_D_minus_B']:+.3f}** "
+              f"(95% CI {lt['recovery_ci95'][0]:.3f}..{lt['recovery_ci95'][1]:.3f}), "
+              f"significant: **{lt['recovery_significant']}**")
+            if lt.get("recovery_fraction_of_gap") is not None:
+                a(f"- That is {lt['recovery_fraction_of_gap']:.1%} of the gap.")
+            a("")
+            for tag, cell in c.items():
+                a(f"- **{tag}** — {cell['description']} "
+                  f"TSS {cell['tss']:.3f} (95% CI {cell['tss_ci95'][0]:.3f}.."
+                  f"{cell['tss_ci95'][1]:.3f}), n = {cell['n']:,}")
+            a("")
+
     # 5. Robustness
     if "robustness" in r:
-        a("## 5. Robustness: a different positive class\n")
+        a("## 6. Robustness: a different positive class\n")
         rc = r["robustness"]["urlhaus_malware"]
         ts = rc["operating_points"].get("tss", {})
         a(f"{rc['description']}\n")
@@ -650,7 +756,7 @@ def _render_one(r: dict) -> list[str]:
     # 6. Self-audit
     if "sampling_confound" in r:
         sc = r["sampling_confound"]
-        a("## 6. Audit of our own collection\n")
+        a("## 7. Audit of our own collection\n")
         if sc.get("available"):
             a(f"{sc['interpretation']}\n")
             a(f"A model given *only* the path-shape features "
@@ -673,7 +779,7 @@ def _render_one(r: dict) -> list[str]:
     # 7. Provenance
     if "live_corpus" in r:
         lc = r["live_corpus"]
-        a("## 7. Live corpus\n")
+        a("## 8. Live corpus\n")
         span = f"{lc['span'][0]} → {lc['span'][1]}" if lc.get("span") else "—"
         a(f"{lc['n_rows']:,} unique URLs over {lc['n_domains']:,} registrable "
           f"domains, {lc['n_phishing']:,} phishing, span {span}.\n")

@@ -1,0 +1,90 @@
+{
+  "model_version": 1,
+  "trained_at_utc": "2026-09-20T19:37:47+00:00",
+  "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
+  "python": "3.12.10",
+  "split_name": "domain_disjoint",
+  "split_sizes": {
+    "train": 315124,
+    "val": 68554,
+    "test": 66498,
+    "train_base_rate": 0.241559,
+    "test_base_rate": 0.184336
+  },
+  "estimator": "RandomForestClassifier",
+  "hyperparameters": {
+    "n_estimators": 300,
+    "max_depth": null,
+    "min_samples_leaf": 2,
+    "class_weight": "balanced_subsample",
+    "random_state": 20260920
+  },
+  "n_features": 52,
+  "thresholds": {
+    "f1": 0.680129,
+    "tss": 0.337894
+  },
+  "top_features": [
+    {
+      "name": "is_https",
+      "importance": 0.384819
+    },
+    {
+      "name": "has_www",
+      "importance": 0.229836
+    },
+    {
+      "name": "subdomain_length",
+      "importance": 0.112813
+    },
+    {
+      "name": "n_subdomains",
+      "importance": 0.097591
+    },
+    {
+      "name": "n_dots",
+      "importance": 0.02956
+    },
+    {
+      "name": "tld_is_common",
+      "importance": 0.024476
+    },
+    {
+      "name": "suspicious_keyword_count",
+      "importance": 0.022322
+    },
+    {
+      "name": "tld_length",
+      "importance": 0.016785
+    },
+    {
+      "name": "special_ratio",
+      "importance": 0.007948
+    },
+    {
+      "name": "domain_length",
+      "importance": 0.007327
+    },
+    {
+      "name": "domain_token_count",
+      "importance": 0.006753
+    },
+    {
+      "name": "brand_outside_domain",
+      "importance": 0.005364
+    },
+    {
+      "name": "n_hyphens",
+      "importance": 0.004852
+    },
+    {
+      "name": "digit_ratio",
+      "importance": 0.004607
+    },
+    {
+      "name": "entropy_url",
+      "importance": 0.004578
+    }
+  ],
+  "benchmark": "kaitholikkal"
+}

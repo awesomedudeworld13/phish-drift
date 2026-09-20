@@ -1,9 +1,9 @@
 {
-  "generated_at_utc": "2026-09-20T19:22:15+00:00",
+  "generated_at_utc": "2026-09-20T19:43:19+00:00",
   "benchmarks": {
     "phiusiil": {
-      "generated_at_utc": "2026-09-20T19:21:14+00:00",
-      "bootstrap_resamples": 1000,
+      "generated_at_utc": "2026-09-20T19:40:42+00:00",
+      "bootstrap_resamples": 600,
       "benchmark": {
         "key": "phiusiil",
         "title": "PhiUSIIL Phishing URL Dataset",
@@ -29,19 +29,27 @@
         "structural_rates": {
           "is_https": {
             "benign": 1.0,
-            "phishing": 0.487354
+            "phishing": 0.487354,
+            "separation": 0.512646,
+            "verdict": "degenerate"
           },
           "has_www": {
             "benign": 1.0,
-            "phishing": 0.413532
+            "phishing": 0.413532,
+            "separation": 0.586468,
+            "verdict": "degenerate"
           },
           "has_path": {
             "benign": 0.0,
-            "phishing": 0.27194
+            "phishing": 0.27194,
+            "separation": 0.27194,
+            "verdict": "degenerate"
           },
           "has_query": {
             "benign": 0.0,
-            "phishing": 0.060221
+            "phishing": 0.060221,
+            "separation": 0.060221,
+            "verdict": "degenerate"
           }
         },
         "note": "The template rule has zero learned parameters and needs no split. If its TSS is comparable to published machine-learning results on this corpus, those results are not evidence of phishing-detection skill."
@@ -72,8 +80,8 @@
               "brier": 0.002015,
               "brier_skill": 0.99177,
               "tss_ci95": [
-                0.994163,
-                0.99668
+                0.994131,
+                0.99672
               ]
             },
             "tss": {
@@ -93,8 +101,8 @@
               "brier": 0.002015,
               "brier_skill": 0.99177,
               "tss_ci95": [
-                0.994163,
-                0.99668
+                0.994131,
+                0.99672
               ]
             }
           }
@@ -124,8 +132,8 @@
               "brier": 0.002022,
               "brier_skill": 0.991756,
               "tss_ci95": [
-                0.993148,
-                0.996833
+                0.993174,
+                0.996805
               ]
             },
             "tss": {
@@ -145,8 +153,8 @@
               "brier": 0.002022,
               "brier_skill": 0.991756,
               "tss_ci95": [
-                0.993148,
-                0.996833
+                0.993174,
+                0.996805
               ]
             }
           }
@@ -176,8 +184,8 @@
               "brier": 0.003396,
               "brier_skill": 0.986416,
               "tss_ci95": [
-                0.972971,
-                0.996816
+                0.972578,
+                0.996785
               ]
             },
             "tss": {
@@ -197,8 +205,8 @@
               "brier": 0.003396,
               "brier_skill": 0.986416,
               "tss_ci95": [
-                0.972971,
-                0.996816
+                0.972578,
+                0.996785
               ]
             }
           }
@@ -299,8 +307,8 @@
         "operating_point": "tss",
         "point_estimate": 0.995544,
         "ci95": [
-          0.994048,
-          0.996673
+          0.993995,
+          0.996706
         ],
         "excludes_zero": true
       },
@@ -398,6 +406,22 @@
         "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
         "verdict": "BREACHED: 0.529 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 92.2% of BENIGN URLs carry a path against 61.7% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.529 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
       },
+      "live_training": {
+        "readiness": {
+          "ready": false,
+          "reason": "1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
+          "n_days": 1,
+          "n_rows": 568,
+          "days_needed": 13,
+          "thresholds": {
+            "min_train_days": 10,
+            "min_holdout_days": 4,
+            "min_rows_per_side": 400,
+            "min_positives_per_side": 100
+          }
+        },
+        "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+      },
       "robustness": {
         "urlhaus_malware": {
           "name": "robustness_urlhaus_malware",
@@ -455,8 +479,8 @@
       "models": {
         "random_split": {
           "model_version": 1,
-          "trained_at_utc": "2026-09-20T19:17:55+00:00",
-          "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+          "trained_at_utc": "2026-09-20T19:34:03+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
           "python": "3.12.10",
           "split_name": "random",
           "split_sizes": {
@@ -545,8 +569,8 @@
         },
         "domain_disjoint": {
           "model_version": 1,
-          "trained_at_utc": "2026-09-20T19:18:26+00:00",
-          "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+          "trained_at_utc": "2026-09-20T19:34:43+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
           "python": "3.12.10",
           "split_name": "domain_disjoint",
           "split_sizes": {
@@ -651,8 +675,8 @@
       }
     },
     "hannousse": {
-      "generated_at_utc": "2026-09-20T19:22:09+00:00",
-      "bootstrap_resamples": 1000,
+      "generated_at_utc": "2026-09-20T19:41:25+00:00",
+      "bootstrap_resamples": 600,
       "benchmark": {
         "key": "hannousse",
         "title": "Web page phishing detection (Hannousse & Yahiouche)",
@@ -678,19 +702,27 @@
         "structural_rates": {
           "is_https": {
             "benign": 0.444969,
-            "phishing": 0.333158
+            "phishing": 0.333158,
+            "separation": 0.111811,
+            "verdict": "ok"
           },
           "has_www": {
             "benign": 0.667892,
-            "phishing": 0.205424
+            "phishing": 0.205424,
+            "separation": 0.462467,
+            "verdict": "elevated"
           },
           "has_path": {
             "benign": 0.612598,
-            "phishing": 0.80175
+            "phishing": 0.80175,
+            "separation": 0.189151,
+            "verdict": "ok"
           },
           "has_query": {
             "benign": 0.033421,
-            "phishing": 0.236745
+            "phishing": 0.236745,
+            "separation": 0.203325,
+            "verdict": "ok"
           }
         },
         "note": "The template rule has zero learned parameters and needs no split. If its TSS is comparable to published machine-learning results on this corpus, those results are not evidence of phishing-detection skill."
@@ -721,8 +753,8 @@
               "brier": 0.07358,
               "brier_skill": 0.705679,
               "tss_ci95": [
-                0.771104,
-                0.836096
+                0.77041,
+                0.838285
               ]
             },
             "tss": {
@@ -742,8 +774,8 @@
               "brier": 0.07358,
               "brier_skill": 0.705679,
               "tss_ci95": [
-                0.771095,
-                0.838986
+                0.769693,
+                0.840478
               ]
             }
           }
@@ -773,8 +805,8 @@
               "brier": 0.086042,
               "brier_skill": 0.648349,
               "tss_ci95": [
-                0.570329,
-                0.82975
+                0.569768,
+                0.830133
               ]
             },
             "tss": {
@@ -794,8 +826,8 @@
               "brier": 0.086042,
               "brier_skill": 0.648349,
               "tss_ci95": [
-                0.570329,
-                0.82975
+                0.569768,
+                0.830133
               ]
             }
           }
@@ -825,8 +857,8 @@
               "brier": 0.059979,
               "brier_skill": 0.760083,
               "tss_ci95": [
-                0.84477,
-                0.954456
+                0.844594,
+                0.953812
               ]
             },
             "tss": {
@@ -846,8 +878,8 @@
               "brier": 0.059979,
               "brier_skill": 0.760083,
               "tss_ci95": [
-                0.84477,
-                0.954456
+                0.844594,
+                0.953812
               ]
             }
           }
@@ -877,8 +909,8 @@
               "brier": 0.211974,
               "brier_skill": 0.149405,
               "tss_ci95": [
-                0.098691,
-                0.495835
+                0.092541,
+                0.507927
               ]
             },
             "tss": {
@@ -898,8 +930,8 @@
               "brier": 0.211974,
               "brier_skill": 0.149405,
               "tss_ci95": [
-                0.098691,
-                0.495835
+                0.092541,
+                0.507927
               ]
             }
           }
@@ -944,8 +976,8 @@
         "operating_point": "tss",
         "point_estimate": 0.435858,
         "ci95": [
-          0.227382,
-          0.633567
+          0.231038,
+          0.625743
         ],
         "excludes_zero": true
       },
@@ -1043,6 +1075,22 @@
         "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
         "verdict": "BREACHED: 0.529 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 92.2% of BENIGN URLs carry a path against 61.7% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.529 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
       },
+      "live_training": {
+        "readiness": {
+          "ready": false,
+          "reason": "1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
+          "n_days": 1,
+          "n_rows": 568,
+          "days_needed": 13,
+          "thresholds": {
+            "min_train_days": 10,
+            "min_holdout_days": 4,
+            "min_rows_per_side": 400,
+            "min_positives_per_side": 100
+          }
+        },
+        "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+      },
       "robustness": {
         "urlhaus_malware": {
           "name": "robustness_urlhaus_malware",
@@ -1069,8 +1117,8 @@
               "brier": 0.050346,
               "brier_skill": 0.516843,
               "tss_ci95": [
-                0.179818,
-                0.588026
+                0.165188,
+                0.590294
               ]
             },
             "tss": {
@@ -1090,8 +1138,8 @@
               "brier": 0.050346,
               "brier_skill": 0.516843,
               "tss_ci95": [
-                0.179818,
-                0.588026
+                0.165188,
+                0.590294
               ]
             }
           }
@@ -1100,8 +1148,8 @@
       "models": {
         "random_split": {
           "model_version": 1,
-          "trained_at_utc": "2026-09-20T19:18:29+00:00",
-          "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+          "trained_at_utc": "2026-09-20T19:34:46+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
           "python": "3.12.10",
           "split_name": "random",
           "split_sizes": {
@@ -1190,8 +1238,8 @@
         },
         "domain_disjoint": {
           "model_version": 1,
-          "trained_at_utc": "2026-09-20T19:18:31+00:00",
-          "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+          "trained_at_utc": "2026-09-20T19:34:48+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
           "python": "3.12.10",
           "split_name": "domain_disjoint",
           "split_sizes": {
@@ -1294,6 +1342,1344 @@
           "2026-09-20"
         ]
       }
+    },
+    "kaitholikkal": {
+      "generated_at_utc": "2026-09-20T19:41:37+00:00",
+      "bootstrap_resamples": 600,
+      "benchmark": {
+        "key": "kaitholikkal",
+        "title": "Phishing URL dataset (Kaitholikkal & Arthi)",
+        "citation": "Kaitholikkal, J. K. S. & Arthi, B. (2024). Phishing URL dataset. Mendeley Data, doi:10.17632/vfszbj9b36.1. Legitimate URLs drawn from the Majestic Million; phishing URLs from PhishTank."
+      },
+      "construction_audit": {
+        "template_rule": {
+          "n": 450176,
+          "confusion": {
+            "tp": 104346,
+            "fp": 298500,
+            "fn": 92,
+            "tn": 47238
+          },
+          "benign_template_share": 0.136629,
+          "phish_template_share": 0.000881,
+          "recall": 0.999119,
+          "false_alarm_rate": 0.863371,
+          "precision": 0.259022,
+          "accuracy": 0.336722,
+          "tss": 0.135749
+        },
+        "structural_rates": {
+          "is_https": {
+            "benign": 0.999896,
+            "phishing": 0.062075,
+            "separation": 0.937821,
+            "verdict": "high_separation"
+          },
+          "has_www": {
+            "benign": 0.997987,
+            "phishing": 0.130364,
+            "separation": 0.867622,
+            "verdict": "high_separation"
+          },
+          "has_path": {
+            "benign": 0.850413,
+            "phishing": 0.915711,
+            "separation": 0.065298,
+            "verdict": "ok"
+          },
+          "has_query": {
+            "benign": 0.132942,
+            "phishing": 0.187461,
+            "separation": 0.054519,
+            "verdict": "ok"
+          }
+        },
+        "note": "The template rule has zero learned parameters and needs no split. If its TSS is comparable to published machine-learning results on this corpus, those results are not evidence of phishing-detection skill."
+      },
+      "cells": {
+        "cell1_benchmark_random": {
+          "name": "cell1_benchmark_random",
+          "description": "Benchmark corpus, random i.i.d. split \u2014 the published protocol.",
+          "n": 67529,
+          "base_rate": 0.232004,
+          "peak_tss": 0.99346,
+          "peak_threshold": 0.242787,
+          "operating_points": {
+            "f1": {
+              "n": 67529,
+              "base_rate": 0.232004,
+              "threshold": 0.575108,
+              "tp": 15565,
+              "fp": 44,
+              "fn": 102,
+              "tn": 51818,
+              "recall": 0.99349,
+              "false_alarm_rate": 0.000848,
+              "precision": 0.997181,
+              "f1": 0.995332,
+              "accuracy": 0.997838,
+              "tss": 0.992641,
+              "brier": 0.001953,
+              "brier_skill": 0.989038,
+              "tss_ci95": [
+                0.991348,
+                0.993843
+              ]
+            },
+            "tss": {
+              "n": 67529,
+              "base_rate": 0.232004,
+              "threshold": 0.24058,
+              "tp": 15602,
+              "fp": 125,
+              "fn": 65,
+              "tn": 51737,
+              "recall": 0.995851,
+              "false_alarm_rate": 0.00241,
+              "precision": 0.992052,
+              "f1": 0.993948,
+              "accuracy": 0.997186,
+              "tss": 0.993441,
+              "brier": 0.001953,
+              "brier_skill": 0.989038,
+              "tss_ci95": [
+                0.992329,
+                0.994603
+              ]
+            }
+          }
+        },
+        "cell2_benchmark_disjoint": {
+          "name": "cell2_benchmark_disjoint",
+          "description": "Benchmark corpus, domain-disjoint split \u2014 no eTLD+1 shared with training.",
+          "n": 66498,
+          "base_rate": 0.184336,
+          "peak_tss": 0.993463,
+          "peak_threshold": 0.207355,
+          "operating_points": {
+            "f1": {
+              "n": 66498,
+              "base_rate": 0.184336,
+              "threshold": 0.680129,
+              "tp": 12166,
+              "fp": 40,
+              "fn": 92,
+              "tn": 54200,
+              "recall": 0.992495,
+              "false_alarm_rate": 0.000737,
+              "precision": 0.996723,
+              "f1": 0.994604,
+              "accuracy": 0.998015,
+              "tss": 0.991757,
+              "brier": 0.00176,
+              "brier_skill": 0.988297,
+              "tss_ci95": [
+                0.989834,
+                0.993839
+              ]
+            },
+            "tss": {
+              "n": 66498,
+              "base_rate": 0.184336,
+              "threshold": 0.337894,
+              "tp": 12207,
+              "fp": 88,
+              "fn": 51,
+              "tn": 54152,
+              "recall": 0.995839,
+              "false_alarm_rate": 0.001622,
+              "precision": 0.992843,
+              "f1": 0.994339,
+              "accuracy": 0.99791,
+              "tss": 0.994217,
+              "brier": 0.00176,
+              "brier_skill": 0.988297,
+              "tss_ci95": [
+                0.992796,
+                0.995524
+              ]
+            }
+          }
+        },
+        "cell3_live_templated_benign": {
+          "name": "cell3_live_templated_benign",
+          "description": "Live feeds, benign rendered in the benchmark's own surface form (https://www.<domain>) \u2014 era changes, construction held fixed.",
+          "n": 600,
+          "base_rate": 0.5,
+          "peak_tss": 0.876667,
+          "peak_threshold": 0.193358,
+          "operating_points": {
+            "f1": {
+              "n": 600,
+              "base_rate": 0.5,
+              "threshold": 0.680129,
+              "tp": 245,
+              "fp": 0,
+              "fn": 55,
+              "tn": 300,
+              "recall": 0.816667,
+              "false_alarm_rate": 0.0,
+              "precision": 1.0,
+              "f1": 0.899083,
+              "accuracy": 0.908333,
+              "tss": 0.816667,
+              "brier": 0.065444,
+              "brier_skill": 0.738226,
+              "tss_ci95": [
+                0.731291,
+                0.905596
+              ]
+            },
+            "tss": {
+              "n": 600,
+              "base_rate": 0.5,
+              "threshold": 0.337894,
+              "tp": 260,
+              "fp": 6,
+              "fn": 40,
+              "tn": 294,
+              "recall": 0.866667,
+              "false_alarm_rate": 0.02,
+              "precision": 0.977444,
+              "f1": 0.918728,
+              "accuracy": 0.923333,
+              "tss": 0.846667,
+              "brier": 0.065444,
+              "brier_skill": 0.738226,
+              "tss_ci95": [
+                0.77725,
+                0.916792
+              ]
+            }
+          }
+        },
+        "cell4_live_realistic_benign": {
+          "name": "cell4_live_realistic_benign",
+          "description": "Live feeds, benign drawn from Common Crawl with real paths \u2014 operational reality.",
+          "n": 568,
+          "base_rate": 0.528169,
+          "peak_tss": 0.186418,
+          "peak_threshold": 0.994103,
+          "operating_points": {
+            "f1": {
+              "n": 568,
+              "base_rate": 0.528169,
+              "threshold": 0.680129,
+              "tp": 245,
+              "fp": 187,
+              "fn": 55,
+              "tn": 81,
+              "recall": 0.816667,
+              "false_alarm_rate": 0.697761,
+              "precision": 0.56713,
+              "f1": 0.669399,
+              "accuracy": 0.573944,
+              "tss": 0.118905,
+              "brier": 0.380261,
+              "brier_skill": -0.525889,
+              "tss_ci95": [
+                -0.095281,
+                0.387782
+              ]
+            },
+            "tss": {
+              "n": 568,
+              "base_rate": 0.528169,
+              "threshold": 0.337894,
+              "tp": 260,
+              "fp": 213,
+              "fn": 40,
+              "tn": 55,
+              "recall": 0.866667,
+              "false_alarm_rate": 0.794776,
+              "precision": 0.549683,
+              "f1": 0.672704,
+              "accuracy": 0.554577,
+              "tss": 0.071891,
+              "brier": 0.380261,
+              "brier_skill": -0.525889,
+              "tss_ci95": [
+                -0.129212,
+                0.317403
+              ]
+            }
+          }
+        }
+      },
+      "attribution_tss": {
+        "f1": {
+          "split_leakage": 0.000884,
+          "total": 0.873736
+        },
+        "tss": {
+          "split_leakage": -0.000776,
+          "total": 0.92155
+        }
+      },
+      "attribution_applicable": {
+        "full_decomposition": false,
+        "benign_template_share": 0.136629,
+        "reason": "This corpus's benign class matches the template in only 13.7% of rows, so cell 3 does NOT hold its construction fixed -- for this corpus, rendering live benign URLs in template form is itself a change of construction. The middle two steps would not measure what their names claim and are withheld. Split leakage (cells 1 vs 2) and the total gap (cells 1 vs 4) are reported because neither depends on cell 3. Cell 3 is still shown as a diagnostic: it reports how the model behaves on template-shaped benign URLs, which is informative but is not a step in a decomposition."
+      },
+      "attribution_steps": [
+        {
+          "step": "split_leakage",
+          "from": "cell1_benchmark_random",
+          "to": "cell2_benchmark_disjoint",
+          "meaning": "Same corpus and era; only the partitioning changes. Skill lost here was memorisation of domains that appear on both sides of a random split."
+        },
+        {
+          "step": "temporal_adversarial_shift",
+          "from": "cell2_benchmark_disjoint",
+          "to": "cell3_live_templated_benign",
+          "meaning": "Corpus changes from the 2024 benchmark to live feeds while the benign surface form is held at the benchmark's. Skill lost here is genuine drift."
+        },
+        {
+          "step": "benign_construction_artifact",
+          "from": "cell3_live_templated_benign",
+          "to": "cell4_live_realistic_benign",
+          "meaning": "Same era and same phishing rows; only the benign class stops being a string template. Skill lost here was never phishing detection at all."
+        }
+      ],
+      "total_gap_ci95": {
+        "operating_point": "tss",
+        "point_estimate": 0.809087,
+        "ci95": [
+          0.571682,
+          0.988009
+        ],
+        "excludes_zero": true
+      },
+      "template_rule_by_cell": {
+        "cell1_benchmark_random": {
+          "n": 67529,
+          "base_rate": 0.232004,
+          "threshold": 0.5,
+          "tp": 15648,
+          "fp": 44823,
+          "fn": 19,
+          "tn": 7039,
+          "recall": 0.998787,
+          "false_alarm_rate": 0.864274,
+          "precision": 0.258769,
+          "f1": 0.411043,
+          "accuracy": 0.335959,
+          "tss": 0.134513,
+          "brier": 0.664041,
+          "brier_skill": -2.726835
+        },
+        "cell2_benchmark_disjoint": {
+          "n": 66498,
+          "base_rate": 0.184336,
+          "threshold": 0.5,
+          "tp": 12247,
+          "fp": 48748,
+          "fn": 11,
+          "tn": 5492,
+          "recall": 0.999103,
+          "false_alarm_rate": 0.898746,
+          "precision": 0.200787,
+          "f1": 0.334375,
+          "accuracy": 0.26676,
+          "tss": 0.100356,
+          "brier": 0.73324,
+          "brier_skill": -3.876678
+        },
+        "cell3_live_templated_benign": {
+          "n": 600,
+          "base_rate": 0.5,
+          "threshold": 0.5,
+          "tp": 286,
+          "fp": 0,
+          "fn": 14,
+          "tn": 300,
+          "recall": 0.953333,
+          "false_alarm_rate": 0.0,
+          "precision": 1.0,
+          "f1": 0.976109,
+          "accuracy": 0.976667,
+          "tss": 0.953333,
+          "brier": 0.023333,
+          "brier_skill": 0.906667
+        },
+        "cell4_live_realistic_benign": {
+          "n": 568,
+          "base_rate": 0.528169,
+          "threshold": 0.5,
+          "tp": 286,
+          "fp": 267,
+          "fn": 14,
+          "tn": 1,
+          "recall": 0.953333,
+          "false_alarm_rate": 0.996269,
+          "precision": 0.517179,
+          "f1": 0.670574,
+          "accuracy": 0.505282,
+          "tss": -0.042935,
+          "brier": 0.494718,
+          "brier_skill": -0.985174
+        }
+      },
+      "sampling_confound": {
+        "available": true,
+        "features_used": [
+          "path_length",
+          "query_length",
+          "fragment_length",
+          "path_depth",
+          "n_query_params",
+          "n_slashes",
+          "n_equals",
+          "n_ampersands"
+        ],
+        "n": 568,
+        "peak_tss_path_shape_only": 0.529154,
+        "threshold": 0.749102,
+        "preregistered_ceiling": 0.3,
+        "ceiling_breached": true,
+        "path_presence_rate": {
+          "benign": 0.921642,
+          "phishing": 0.616667
+        },
+        "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
+        "verdict": "BREACHED: 0.529 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 92.2% of BENIGN URLs carry a path against 61.7% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.529 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
+      },
+      "live_training": {
+        "readiness": {
+          "ready": false,
+          "reason": "1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
+          "n_days": 1,
+          "n_rows": 568,
+          "days_needed": 13,
+          "thresholds": {
+            "min_train_days": 10,
+            "min_holdout_days": 4,
+            "min_rows_per_side": 400,
+            "min_positives_per_side": 100
+          }
+        },
+        "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+      },
+      "robustness": {
+        "urlhaus_malware": {
+          "name": "robustness_urlhaus_malware",
+          "description": "Live URLhaus malware-distribution URLs vs realistic benign \u2014 a different positive class, same benchmark-trained model.",
+          "n": 2268,
+          "base_rate": 0.881834,
+          "peak_tss": 0.933075,
+          "peak_threshold": 0.996667,
+          "operating_points": {
+            "f1": {
+              "n": 2268,
+              "base_rate": 0.881834,
+              "threshold": 0.680129,
+              "tp": 1991,
+              "fp": 187,
+              "fn": 9,
+              "tn": 81,
+              "recall": 0.9955,
+              "false_alarm_rate": 0.697761,
+              "precision": 0.914141,
+              "f1": 0.953088,
+              "accuracy": 0.91358,
+              "tss": 0.297739,
+              "brier": 0.082488,
+              "brier_skill": 0.208389,
+              "tss_ci95": [
+                0.100442,
+                0.530282
+              ]
+            },
+            "tss": {
+              "n": 2268,
+              "base_rate": 0.881834,
+              "threshold": 0.337894,
+              "tp": 1992,
+              "fp": 213,
+              "fn": 8,
+              "tn": 55,
+              "recall": 0.996,
+              "false_alarm_rate": 0.794776,
+              "precision": 0.903401,
+              "f1": 0.947444,
+              "accuracy": 0.902557,
+              "tss": 0.201224,
+              "brier": 0.082488,
+              "brier_skill": 0.208389,
+              "tss_ci95": [
+                0.014899,
+                0.446011
+              ]
+            }
+          }
+        }
+      },
+      "models": {
+        "random_split": {
+          "model_version": 1,
+          "trained_at_utc": "2026-09-20T19:36:31+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
+          "python": "3.12.10",
+          "split_name": "random",
+          "split_sizes": {
+            "train": 315122,
+            "val": 67525,
+            "test": 67529,
+            "train_base_rate": 0.231993,
+            "test_base_rate": 0.232004
+          },
+          "estimator": "RandomForestClassifier",
+          "hyperparameters": {
+            "n_estimators": 300,
+            "max_depth": null,
+            "min_samples_leaf": 2,
+            "class_weight": "balanced_subsample",
+            "random_state": 20260920
+          },
+          "n_features": 52,
+          "thresholds": {
+            "f1": 0.575108,
+            "tss": 0.24058
+          },
+          "top_features": [
+            {
+              "name": "is_https",
+              "importance": 0.378791
+            },
+            {
+              "name": "has_www",
+              "importance": 0.214863
+            },
+            {
+              "name": "subdomain_length",
+              "importance": 0.118848
+            },
+            {
+              "name": "n_subdomains",
+              "importance": 0.108101
+            },
+            {
+              "name": "n_dots",
+              "importance": 0.030293
+            },
+            {
+              "name": "suspicious_keyword_count",
+              "importance": 0.025738
+            },
+            {
+              "name": "tld_is_common",
+              "importance": 0.023525
+            },
+            {
+              "name": "tld_length",
+              "importance": 0.016822
+            },
+            {
+              "name": "special_ratio",
+              "importance": 0.009008
+            },
+            {
+              "name": "domain_length",
+              "importance": 0.006426
+            },
+            {
+              "name": "domain_token_count",
+              "importance": 0.005741
+            },
+            {
+              "name": "n_hyphens",
+              "importance": 0.004935
+            },
+            {
+              "name": "entropy_url",
+              "importance": 0.004617
+            },
+            {
+              "name": "entropy_domain",
+              "importance": 0.004536
+            },
+            {
+              "name": "brand_outside_domain",
+              "importance": 0.004371
+            }
+          ],
+          "benchmark": "kaitholikkal"
+        },
+        "domain_disjoint": {
+          "model_version": 1,
+          "trained_at_utc": "2026-09-20T19:37:47+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
+          "python": "3.12.10",
+          "split_name": "domain_disjoint",
+          "split_sizes": {
+            "train": 315124,
+            "val": 68554,
+            "test": 66498,
+            "train_base_rate": 0.241559,
+            "test_base_rate": 0.184336
+          },
+          "estimator": "RandomForestClassifier",
+          "hyperparameters": {
+            "n_estimators": 300,
+            "max_depth": null,
+            "min_samples_leaf": 2,
+            "class_weight": "balanced_subsample",
+            "random_state": 20260920
+          },
+          "n_features": 52,
+          "thresholds": {
+            "f1": 0.680129,
+            "tss": 0.337894
+          },
+          "top_features": [
+            {
+              "name": "is_https",
+              "importance": 0.384819
+            },
+            {
+              "name": "has_www",
+              "importance": 0.229836
+            },
+            {
+              "name": "subdomain_length",
+              "importance": 0.112813
+            },
+            {
+              "name": "n_subdomains",
+              "importance": 0.097591
+            },
+            {
+              "name": "n_dots",
+              "importance": 0.02956
+            },
+            {
+              "name": "tld_is_common",
+              "importance": 0.024476
+            },
+            {
+              "name": "suspicious_keyword_count",
+              "importance": 0.022322
+            },
+            {
+              "name": "tld_length",
+              "importance": 0.016785
+            },
+            {
+              "name": "special_ratio",
+              "importance": 0.007948
+            },
+            {
+              "name": "domain_length",
+              "importance": 0.007327
+            },
+            {
+              "name": "domain_token_count",
+              "importance": 0.006753
+            },
+            {
+              "name": "brand_outside_domain",
+              "importance": 0.005364
+            },
+            {
+              "name": "n_hyphens",
+              "importance": 0.004852
+            },
+            {
+              "name": "digit_ratio",
+              "importance": 0.004607
+            },
+            {
+              "name": "entropy_url",
+              "importance": 0.004578
+            }
+          ],
+          "benchmark": "kaitholikkal"
+        }
+      },
+      "live_corpus": {
+        "n_rows": 2868,
+        "n_phishing": 2300,
+        "by_source": {
+          "urlhaus": 2000,
+          "openphish": 300,
+          "tranco_templated": 300,
+          "commoncrawl": 268
+        },
+        "n_domains": 1386,
+        "span": [
+          "2026-09-20",
+          "2026-09-20"
+        ]
+      }
+    },
+    "faizann": {
+      "generated_at_utc": "2026-09-20T19:42:32+00:00",
+      "bootstrap_resamples": 600,
+      "benchmark": {
+        "key": "faizann",
+        "title": "Malicious URL corpus (faizann24, community)",
+        "citation": "faizann24, 'Using machine learning to detect malicious URLs', GitHub, data/data.csv. Community dataset with no accompanying paper; included for its wide reuse, not its provenance."
+      },
+      "construction_audit": {
+        "template_rule": {
+          "n": 420464,
+          "confusion": {
+            "tp": 75643,
+            "fp": 344821,
+            "fn": 0,
+            "tn": 0
+          },
+          "benign_template_share": 0.0,
+          "phish_template_share": 0.0,
+          "recall": 1.0,
+          "false_alarm_rate": 1.0,
+          "precision": 0.179904,
+          "accuracy": 0.179904,
+          "tss": 0.0
+        },
+        "structural_rates": {
+          "is_https": {
+            "benign": 0.0,
+            "phishing": 9.3e-05,
+            "separation": 9.3e-05,
+            "verdict": "constant"
+          },
+          "has_www": {
+            "benign": 0.0,
+            "phishing": 0.029613,
+            "separation": 0.029613,
+            "verdict": "ok"
+          },
+          "has_path": {
+            "benign": 0.860838,
+            "phishing": 0.920865,
+            "separation": 0.060027,
+            "verdict": "ok"
+          },
+          "has_query": {
+            "benign": 0.136877,
+            "phishing": 0.159962,
+            "separation": 0.023085,
+            "verdict": "ok"
+          }
+        },
+        "note": "The template rule has zero learned parameters and needs no split. If its TSS is comparable to published machine-learning results on this corpus, those results are not evidence of phishing-detection skill."
+      },
+      "cells": {
+        "cell1_benchmark_random": {
+          "name": "cell1_benchmark_random",
+          "description": "Benchmark corpus, random i.i.d. split \u2014 the published protocol.",
+          "n": 63071,
+          "base_rate": 0.179908,
+          "peak_tss": 0.892806,
+          "peak_threshold": 0.351769,
+          "operating_points": {
+            "f1": {
+              "n": 63071,
+              "base_rate": 0.179908,
+              "threshold": 0.527725,
+              "tp": 10042,
+              "fp": 950,
+              "fn": 1305,
+              "tn": 50774,
+              "recall": 0.884992,
+              "false_alarm_rate": 0.018367,
+              "precision": 0.913574,
+              "f1": 0.899055,
+              "accuracy": 0.964247,
+              "tss": 0.866625,
+              "brier": 0.031091,
+              "brier_skill": 0.789272,
+              "tss_ci95": [
+                0.85926,
+                0.874219
+              ]
+            },
+            "tss": {
+              "n": 63071,
+              "base_rate": 0.179908,
+              "threshold": 0.342474,
+              "tp": 10674,
+              "fp": 2568,
+              "fn": 673,
+              "tn": 49156,
+              "recall": 0.940689,
+              "false_alarm_rate": 0.049648,
+              "precision": 0.806072,
+              "f1": 0.868193,
+              "accuracy": 0.948613,
+              "tss": 0.891041,
+              "brier": 0.031091,
+              "brier_skill": 0.789272,
+              "tss_ci95": [
+                0.882565,
+                0.899709
+              ]
+            }
+          }
+        },
+        "cell2_benchmark_disjoint": {
+          "name": "cell2_benchmark_disjoint",
+          "description": "Benchmark corpus, domain-disjoint split \u2014 no eTLD+1 shared with training.",
+          "n": 62994,
+          "base_rate": 0.179366,
+          "peak_tss": 0.803985,
+          "peak_threshold": 0.402923,
+          "operating_points": {
+            "f1": {
+              "n": 62994,
+              "base_rate": 0.179366,
+              "threshold": 0.48213,
+              "tp": 9628,
+              "fp": 3024,
+              "fn": 1671,
+              "tn": 48671,
+              "recall": 0.852111,
+              "false_alarm_rate": 0.058497,
+              "precision": 0.760986,
+              "f1": 0.803975,
+              "accuracy": 0.925469,
+              "tss": 0.793614,
+              "brier": 0.062147,
+              "brier_skill": 0.577789,
+              "tss_ci95": [
+                0.771816,
+                0.814035
+              ]
+            },
+            "tss": {
+              "n": 62994,
+              "base_rate": 0.179366,
+              "threshold": 0.371919,
+              "tp": 10163,
+              "fp": 5052,
+              "fn": 1136,
+              "tn": 46643,
+              "recall": 0.89946,
+              "false_alarm_rate": 0.097727,
+              "precision": 0.667959,
+              "f1": 0.766614,
+              "accuracy": 0.901768,
+              "tss": 0.801733,
+              "brier": 0.062147,
+              "brier_skill": 0.577789,
+              "tss_ci95": [
+                0.781178,
+                0.818581
+              ]
+            }
+          }
+        },
+        "cell3_live_templated_benign": {
+          "name": "cell3_live_templated_benign",
+          "description": "Live feeds, benign rendered in the benchmark's own surface form (https://www.<domain>) \u2014 era changes, construction held fixed.",
+          "n": 600,
+          "base_rate": 0.5,
+          "peak_tss": 0.03,
+          "peak_threshold": 0.873892,
+          "operating_points": {
+            "f1": {
+              "n": 600,
+              "base_rate": 0.5,
+              "threshold": 0.48213,
+              "tp": 225,
+              "fp": 300,
+              "fn": 75,
+              "tn": 0,
+              "recall": 0.75,
+              "false_alarm_rate": 1.0,
+              "precision": 0.428571,
+              "f1": 0.545455,
+              "accuracy": 0.375,
+              "tss": -0.25,
+              "brier": 0.411907,
+              "brier_skill": -0.647629,
+              "tss_ci95": [
+                -0.315822,
+                -0.19391
+              ]
+            },
+            "tss": {
+              "n": 600,
+              "base_rate": 0.5,
+              "threshold": 0.371919,
+              "tp": 260,
+              "fp": 300,
+              "fn": 40,
+              "tn": 0,
+              "recall": 0.866667,
+              "false_alarm_rate": 1.0,
+              "precision": 0.464286,
+              "f1": 0.604651,
+              "accuracy": 0.433333,
+              "tss": -0.133333,
+              "brier": 0.411907,
+              "brier_skill": -0.647629,
+              "tss_ci95": [
+                -0.195728,
+                -0.078603
+              ]
+            }
+          }
+        },
+        "cell4_live_realistic_benign": {
+          "name": "cell4_live_realistic_benign",
+          "description": "Live feeds, benign drawn from Common Crawl with real paths \u2014 operational reality.",
+          "n": 568,
+          "base_rate": 0.528169,
+          "peak_tss": 0.380647,
+          "peak_threshold": 0.406463,
+          "operating_points": {
+            "f1": {
+              "n": 568,
+              "base_rate": 0.528169,
+              "threshold": 0.48213,
+              "tp": 225,
+              "fp": 107,
+              "fn": 75,
+              "tn": 161,
+              "recall": 0.75,
+              "false_alarm_rate": 0.399254,
+              "precision": 0.677711,
+              "f1": 0.712025,
+              "accuracy": 0.679577,
+              "tss": 0.350746,
+              "brier": 0.210864,
+              "brier_skill": 0.153859,
+              "tss_ci95": [
+                0.135634,
+                0.571521
+              ]
+            },
+            "tss": {
+              "n": 568,
+              "base_rate": 0.528169,
+              "threshold": 0.371919,
+              "tp": 260,
+              "fp": 146,
+              "fn": 40,
+              "tn": 122,
+              "recall": 0.866667,
+              "false_alarm_rate": 0.544776,
+              "precision": 0.640394,
+              "f1": 0.736544,
+              "accuracy": 0.672535,
+              "tss": 0.321891,
+              "brier": 0.210864,
+              "brier_skill": 0.153859,
+              "tss_ci95": [
+                0.11705,
+                0.525621
+              ]
+            }
+          }
+        }
+      },
+      "attribution_tss": {
+        "f1": {
+          "split_leakage": 0.073011,
+          "total": 0.515879
+        },
+        "tss": {
+          "split_leakage": 0.089308,
+          "total": 0.56915
+        }
+      },
+      "attribution_applicable": {
+        "full_decomposition": false,
+        "benign_template_share": 0.0,
+        "reason": "This corpus's benign class matches the template in only 0.0% of rows, so cell 3 does NOT hold its construction fixed -- for this corpus, rendering live benign URLs in template form is itself a change of construction. The middle two steps would not measure what their names claim and are withheld. Split leakage (cells 1 vs 2) and the total gap (cells 1 vs 4) are reported because neither depends on cell 3. Cell 3 is still shown as a diagnostic: it reports how the model behaves on template-shaped benign URLs, which is informative but is not a step in a decomposition."
+      },
+      "attribution_steps": [
+        {
+          "step": "split_leakage",
+          "from": "cell1_benchmark_random",
+          "to": "cell2_benchmark_disjoint",
+          "meaning": "Same corpus and era; only the partitioning changes. Skill lost here was memorisation of domains that appear on both sides of a random split."
+        },
+        {
+          "step": "temporal_adversarial_shift",
+          "from": "cell2_benchmark_disjoint",
+          "to": "cell3_live_templated_benign",
+          "meaning": "Corpus changes from the 2024 benchmark to live feeds while the benign surface form is held at the benchmark's. Skill lost here is genuine drift."
+        },
+        {
+          "step": "benign_construction_artifact",
+          "from": "cell3_live_templated_benign",
+          "to": "cell4_live_realistic_benign",
+          "meaning": "Same era and same phishing rows; only the benign class stops being a string template. Skill lost here was never phishing detection at all."
+        }
+      ],
+      "total_gap_ci95": {
+        "operating_point": "tss",
+        "point_estimate": 0.458426,
+        "ci95": [
+          0.268056,
+          0.637593
+        ],
+        "excludes_zero": true
+      },
+      "template_rule_by_cell": {
+        "cell1_benchmark_random": {
+          "n": 63071,
+          "base_rate": 0.179908,
+          "threshold": 0.5,
+          "tp": 11347,
+          "fp": 51724,
+          "fn": 0,
+          "tn": 0,
+          "recall": 1.0,
+          "false_alarm_rate": 1.0,
+          "precision": 0.179908,
+          "f1": 0.304953,
+          "accuracy": 0.179908,
+          "tss": 0.0,
+          "brier": 0.820092,
+          "brier_skill": -4.558385
+        },
+        "cell2_benchmark_disjoint": {
+          "n": 62994,
+          "base_rate": 0.179366,
+          "threshold": 0.5,
+          "tp": 11299,
+          "fp": 51695,
+          "fn": 0,
+          "tn": 0,
+          "recall": 1.0,
+          "false_alarm_rate": 1.0,
+          "precision": 0.179366,
+          "f1": 0.304174,
+          "accuracy": 0.179366,
+          "tss": 0.0,
+          "brier": 0.820634,
+          "brier_skill": -4.575184
+        },
+        "cell3_live_templated_benign": {
+          "n": 600,
+          "base_rate": 0.5,
+          "threshold": 0.5,
+          "tp": 286,
+          "fp": 0,
+          "fn": 14,
+          "tn": 300,
+          "recall": 0.953333,
+          "false_alarm_rate": 0.0,
+          "precision": 1.0,
+          "f1": 0.976109,
+          "accuracy": 0.976667,
+          "tss": 0.953333,
+          "brier": 0.023333,
+          "brier_skill": 0.906667
+        },
+        "cell4_live_realistic_benign": {
+          "n": 568,
+          "base_rate": 0.528169,
+          "threshold": 0.5,
+          "tp": 286,
+          "fp": 267,
+          "fn": 14,
+          "tn": 1,
+          "recall": 0.953333,
+          "false_alarm_rate": 0.996269,
+          "precision": 0.517179,
+          "f1": 0.670574,
+          "accuracy": 0.505282,
+          "tss": -0.042935,
+          "brier": 0.494718,
+          "brier_skill": -0.985174
+        }
+      },
+      "sampling_confound": {
+        "available": true,
+        "features_used": [
+          "path_length",
+          "query_length",
+          "fragment_length",
+          "path_depth",
+          "n_query_params",
+          "n_slashes",
+          "n_equals",
+          "n_ampersands"
+        ],
+        "n": 568,
+        "peak_tss_path_shape_only": 0.529154,
+        "threshold": 0.749102,
+        "preregistered_ceiling": 0.3,
+        "ceiling_breached": true,
+        "path_presence_rate": {
+          "benign": 0.921642,
+          "phishing": 0.616667
+        },
+        "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
+        "verdict": "BREACHED: 0.529 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 92.2% of BENIGN URLs carry a path against 61.7% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.529 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
+      },
+      "live_training": {
+        "readiness": {
+          "ready": false,
+          "reason": "1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
+          "n_days": 1,
+          "n_rows": 568,
+          "days_needed": 13,
+          "thresholds": {
+            "min_train_days": 10,
+            "min_holdout_days": 4,
+            "min_rows_per_side": 400,
+            "min_positives_per_side": 100
+          }
+        },
+        "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 1 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+      },
+      "robustness": {
+        "urlhaus_malware": {
+          "name": "robustness_urlhaus_malware",
+          "description": "Live URLhaus malware-distribution URLs vs realistic benign \u2014 a different positive class, same benchmark-trained model.",
+          "n": 2268,
+          "base_rate": 0.881834,
+          "peak_tss": 0.950769,
+          "peak_threshold": 0.874158,
+          "operating_points": {
+            "f1": {
+              "n": 2268,
+              "base_rate": 0.881834,
+              "threshold": 0.48213,
+              "tp": 1982,
+              "fp": 107,
+              "fn": 18,
+              "tn": 161,
+              "recall": 0.991,
+              "false_alarm_rate": 0.399254,
+              "precision": 0.948779,
+              "f1": 0.96943,
+              "accuracy": 0.944885,
+              "tss": 0.591746,
+              "brier": 0.032097,
+              "brier_skill": 0.691976,
+              "tss_ci95": [
+                0.37639,
+                0.795036
+              ]
+            },
+            "tss": {
+              "n": 2268,
+              "base_rate": 0.881834,
+              "threshold": 0.371919,
+              "tp": 1988,
+              "fp": 146,
+              "fn": 12,
+              "tn": 122,
+              "recall": 0.994,
+              "false_alarm_rate": 0.544776,
+              "precision": 0.931584,
+              "f1": 0.96178,
+              "accuracy": 0.930335,
+              "tss": 0.449224,
+              "brier": 0.032097,
+              "brier_skill": 0.691976,
+              "tss_ci95": [
+                0.280491,
+                0.653838
+              ]
+            }
+          }
+        }
+      },
+      "models": {
+        "random_split": {
+          "model_version": 1,
+          "trained_at_utc": "2026-09-20T19:39:07+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
+          "python": "3.12.10",
+          "split_name": "random",
+          "split_sizes": {
+            "train": 294324,
+            "val": 63069,
+            "test": 63071,
+            "train_base_rate": 0.179904,
+            "test_base_rate": 0.179908
+          },
+          "estimator": "RandomForestClassifier",
+          "hyperparameters": {
+            "n_estimators": 300,
+            "max_depth": null,
+            "min_samples_leaf": 2,
+            "class_weight": "balanced_subsample",
+            "random_state": 20260920
+          },
+          "n_features": 52,
+          "thresholds": {
+            "f1": 0.527725,
+            "tss": 0.342474
+          },
+          "top_features": [
+            {
+              "name": "tld_is_common",
+              "importance": 0.08109
+            },
+            {
+              "name": "tld_length",
+              "importance": 0.06816
+            },
+            {
+              "name": "path_length",
+              "importance": 0.06348
+            },
+            {
+              "name": "suspicious_keyword_count",
+              "importance": 0.053995
+            },
+            {
+              "name": "n_hyphens",
+              "importance": 0.050705
+            },
+            {
+              "name": "special_ratio",
+              "importance": 0.045358
+            },
+            {
+              "name": "entropy_url",
+              "importance": 0.044465
+            },
+            {
+              "name": "url_length",
+              "importance": 0.042424
+            },
+            {
+              "name": "entropy_domain",
+              "importance": 0.041595
+            },
+            {
+              "name": "digit_ratio",
+              "importance": 0.038611
+            },
+            {
+              "name": "letter_ratio",
+              "importance": 0.038576
+            },
+            {
+              "name": "domain_longest_token",
+              "importance": 0.034003
+            },
+            {
+              "name": "path_depth",
+              "importance": 0.032803
+            },
+            {
+              "name": "n_slashes",
+              "importance": 0.032712
+            },
+            {
+              "name": "n_dots",
+              "importance": 0.032067
+            }
+          ],
+          "benchmark": "faizann"
+        },
+        "domain_disjoint": {
+          "model_version": 1,
+          "trained_at_utc": "2026-09-20T19:40:14+00:00",
+          "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
+          "python": "3.12.10",
+          "split_name": "domain_disjoint",
+          "split_sizes": {
+            "train": 294349,
+            "val": 63121,
+            "test": 62994,
+            "train_base_rate": 0.172547,
+            "test_base_rate": 0.179366
+          },
+          "estimator": "RandomForestClassifier",
+          "hyperparameters": {
+            "n_estimators": 300,
+            "max_depth": null,
+            "min_samples_leaf": 2,
+            "class_weight": "balanced_subsample",
+            "random_state": 20260920
+          },
+          "n_features": 52,
+          "thresholds": {
+            "f1": 0.48213,
+            "tss": 0.371919
+          },
+          "top_features": [
+            {
+              "name": "tld_is_common",
+              "importance": 0.07893
+            },
+            {
+              "name": "tld_length",
+              "importance": 0.068457
+            },
+            {
+              "name": "path_length",
+              "importance": 0.063272
+            },
+            {
+              "name": "suspicious_keyword_count",
+              "importance": 0.052167
+            },
+            {
+              "name": "special_ratio",
+              "importance": 0.04543
+            },
+            {
+              "name": "entropy_domain",
+              "importance": 0.044659
+            },
+            {
+              "name": "n_hyphens",
+              "importance": 0.044212
+            },
+            {
+              "name": "entropy_url",
+              "importance": 0.043277
+            },
+            {
+              "name": "url_length",
+              "importance": 0.042658
+            },
+            {
+              "name": "digit_ratio",
+              "importance": 0.041099
+            },
+            {
+              "name": "letter_ratio",
+              "importance": 0.039188
+            },
+            {
+              "name": "domain_longest_token",
+              "importance": 0.03834
+            },
+            {
+              "name": "n_slashes",
+              "importance": 0.033707
+            },
+            {
+              "name": "path_depth",
+              "importance": 0.032995
+            },
+            {
+              "name": "domain_vowel_ratio",
+              "importance": 0.032981
+            }
+          ],
+          "benchmark": "faizann"
+        }
+      },
+      "live_corpus": {
+        "n_rows": 2868,
+        "n_phishing": 2300,
+        "by_source": {
+          "urlhaus": 2000,
+          "openphish": 300,
+          "tranco_templated": 300,
+          "commoncrawl": 268
+        },
+        "n_domains": 1386,
+        "span": [
+          "2026-09-20",
+          "2026-09-20"
+        ]
+      }
     }
   },
   "comparison": [
@@ -1309,6 +2695,8 @@
         "has_path",
         "has_query"
       ],
+      "constant_properties": [],
+      "max_single_property_tss": 0.586468,
       "cell1_tss": 0.995544,
       "cell4_tss": 0.0,
       "total_gap": 0.995544,
@@ -1317,16 +2705,55 @@
       "construction_share": 0.991083
     },
     {
+      "key": "kaitholikkal",
+      "title": "Phishing URL dataset (Kaitholikkal & Arthi)",
+      "n": 450176,
+      "template_rule_tss": 0.135749,
+      "benign_template_share": 0.136629,
+      "degenerate_properties": [
+        "is_https",
+        "has_www"
+      ],
+      "constant_properties": [],
+      "max_single_property_tss": 0.937821,
+      "cell1_tss": 0.993441,
+      "cell4_tss": 0.071891,
+      "total_gap": 0.92155,
+      "split_leakage": -0.000776,
+      "decomposable": false,
+      "construction_share": null
+    },
+    {
       "key": "hannousse",
       "title": "Web page phishing detection (Hannousse & Yahiouche)",
       "n": 11430,
       "template_rule_tss": 0.160805,
       "benign_template_share": 0.164654,
       "degenerate_properties": [],
+      "constant_properties": [],
+      "max_single_property_tss": 0.462467,
       "cell1_tss": 0.806527,
       "cell4_tss": 0.29806,
       "total_gap": 0.508467,
       "split_leakage": 0.08787,
+      "decomposable": false,
+      "construction_share": null
+    },
+    {
+      "key": "faizann",
+      "title": "Malicious URL corpus (faizann24, community)",
+      "n": 420464,
+      "template_rule_tss": 0.0,
+      "benign_template_share": 0.0,
+      "degenerate_properties": [],
+      "constant_properties": [
+        "is_https"
+      ],
+      "max_single_property_tss": 0.060027,
+      "cell1_tss": 0.891041,
+      "cell4_tss": 0.321891,
+      "total_gap": 0.56915,
+      "split_leakage": 0.089308,
       "decomposable": false,
       "construction_share": null
     }
