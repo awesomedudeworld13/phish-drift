@@ -31,7 +31,7 @@ concurrency:
 jobs:
   rebuild:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 180
     steps:
       - uses: actions/checkout@v4
 
@@ -46,8 +46,10 @@ jobs:
       - name: Cache benchmark archive
         uses: actions/cache@v4
         with:
-          path: data/phiusiil.zip
-          key: phiusiil-v1
+          path: |
+            data/phiusiil.zip
+            data/faizann.csv
+          key: corpora-v2
 
       - name: Invariant checks
         run: python tests/test_features.py

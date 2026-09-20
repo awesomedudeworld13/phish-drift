@@ -30,8 +30,10 @@ jobs:
       - name: Cache benchmark archive
         uses: actions/cache@v4
         with:
-          path: data/phiusiil.zip
-          key: phiusiil-v1
+          path: |
+            data/phiusiil.zip
+            data/faizann.csv
+          key: corpora-v2
 
       # The construction audit is the project's headline and has no learned
       # parameters, so it must reproduce exactly on every commit -- for BOTH
@@ -40,7 +42,7 @@ jobs:
       - name: Construction audit reproduces (both corpora)
         run: |
           python -m phishdrift.cli audit | tee audit.txt
-          for expected in "0.9897" "0.1608"; do
+          for expected in "0.9897" "0.1608" "0.1357" "0.0000"; do
             grep -q "TSS         : $expected" audit.txt || {
               echo "::error::Construction audit TSS $expected not found"
               exit 1

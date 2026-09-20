@@ -159,6 +159,38 @@ def _load_hannousse(path: Path) -> pd.DataFrame:
     })
 
 
+def _load_kaitholikkal(path: Path) -> pd.DataFrame:
+    """Kaitholikkal & Arthi ship ``url,type`` with type in {legitimate, phishing}."""
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8", errors="replace", newline="") as fh:
+        raw = pd.read_csv(fh, usecols=["url", "type"], on_bad_lines="skip")
+    raw = raw.dropna(subset=["url", "type"])
+    return pd.DataFrame({
+        "url": raw["url"].astype(str),
+        "y": (raw["type"].str.strip().str.lower() != "legitimate").astype(np.int8),
+    })
+
+
+def _load_faizann(path: Path) -> pd.DataFrame:
+    """A widely-copied community corpus labelled ``good`` / ``bad``.
+
+    Provenance is weaker than the other three: it is a GitHub repository rather
+    than a peer-reviewed release, with no accompanying paper. It is included
+    precisely because it is one of the most-copied phishing URL datasets in
+    circulation -- it appears in a large number of derivative tutorials and
+    notebooks -- so what it teaches a model is worth measuring regardless of
+    where it was published. Its status is stated rather than glossed.
+    """
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8", errors="replace", newline="") as fh:
+        raw = pd.read_csv(fh, usecols=["url", "label"], on_bad_lines="skip")
+    raw = raw.dropna(subset=["url", "label"])
+    return pd.DataFrame({
+        "url": raw["url"].astype(str),
+        "y": (raw["label"].str.strip().str.lower() == "bad").astype(np.int8),
+    })
+
+
 BENCHMARKS: dict[str, BenchmarkSource] = {
     "phiusiil": BenchmarkSource(
         key="phiusiil",
@@ -199,6 +231,45 @@ BENCHMARKS: dict[str, BenchmarkSource] = {
         # unattended CI download is not dependable. CC BY 4.0 permits
         # redistribution with attribution, so the exact bytes are committed.
         vendored="data/benchmarks/hannousse_dataset_B_05_2020.csv.gz",
+    ),
+    "kaitholikkal": BenchmarkSource(
+        key="kaitholikkal",
+        title="Phishing URL dataset (Kaitholikkal & Arthi)",
+        citation=(
+            "Kaitholikkal, J. K. S. & Arthi, B. (2024). Phishing URL dataset. "
+            "Mendeley Data, doi:10.17632/vfszbj9b36.1. Legitimate URLs drawn "
+            "from the Majestic Million; phishing URLs from PhishTank."
+        ),
+        url=(
+            "https://data.mendeley.com/public-files/datasets/vfszbj9b36/files/"
+            "f0de314f-ea72-4385-9faa-f06593bb0a2d/file_downloaded"
+        ),
+        filename="kaitholikkal.csv",
+        min_bytes=10_000_000,
+        _loader="_load_kaitholikkal",
+        licence="CC BY 4.0",
+        sha256="accb2dfbfd3329a8b5cb1b85dcad90314a660c272be755cb45d0f6865014b466",
+        vendored="data/benchmarks/kaitholikkal_url_dataset.csv.gz",
+    ),
+    "faizann": BenchmarkSource(
+        key="faizann",
+        title="Malicious URL corpus (faizann24, community)",
+        citation=(
+            "faizann24, 'Using machine learning to detect malicious URLs', "
+            "GitHub, data/data.csv. Community dataset with no accompanying "
+            "paper; included for its wide reuse, not its provenance."
+        ),
+        url=(
+            "https://raw.githubusercontent.com/faizann24/"
+            "Using-machine-learning-to-detect-malicious-URLs/master/data/data.csv"
+        ),
+        filename="faizann.csv",
+        min_bytes=10_000_000,
+        _loader="_load_faizann",
+        licence="unspecified",
+        # GitHub raw serves Python's HTTP stack normally, so unlike the Mendeley
+        # sources this one needs no committed copy. It is also of unspecified
+        # licence, so redistributing it would not be appropriate in any case.
     ),
 }
 
@@ -321,12 +392,43 @@ def template_audit(df: pd.DataFrame) -> TemplateAudit:
 def structural_degeneracy(df: pd.DataFrame) -> dict:
     """Per-class rates of the four surface properties the template is built from.
 
-    A healthy corpus has these overlapping between classes. Rates of exactly
-    0.0 or 1.0 on one side mean the property is a class label in disguise.
-    """
-    from urllib.parse import urlsplit
+    ``separation`` is ``|P(property | benign) - P(property | phishing)|``, which
+    is exactly the TSS of using that single property as the entire classifier.
+    That makes it directly comparable to every other number in this project: a
+    separation of 0.94 means one boolean beats most published models.
 
-    parsed = [urlsplit(u if "://" in u else "http://" + u) for u in df["url"]]
+    Corpora fail in two distinct ways and conflating them would misreport both:
+
+    ``degenerate``       extreme on the benign side (exactly 0.0 or 1.0) and
+                         materially different on the other. The danger is the
+                         *conjunction*: because no benign row deviates, a rule
+                         combining several such properties identifies the benign
+                         class with perfect precision. This is PhiUSIIL, where
+                         individual separations are only 0.27-0.59 but the four
+                         together yield a template rule scoring TSS 0.9897.
+    ``high_separation``  one property alone achieves separation >= 0.70. No
+                         conjunction needed and no exact extreme required -- a
+                         corpus at 0.9999 vs 0.0621 is not "nearly clean", it is
+                         solved by a single boolean. Testing only for exact
+                         extremes misses this entirely.
+    ``elevated``         separation >= 0.35. Plausibly a real-world signal
+                         (legitimate sites genuinely do use ``www`` more), but
+                         worth stating rather than burying.
+    ``constant``         the same extreme on *both* sides. The corpus destroyed
+                         the information rather than leaking it -- harmless for
+                         leakage, but it cannot teach a model a signal that real
+                         deployments have (a corpus that strips URL schemes can
+                         never teach anything about ``https``).
+    ``ok``              overlapping, as a healthy corpus should be.
+    """
+    # Parsing must be as forgiving as feature extraction: live and third-party
+    # corpora contain genuinely malformed URLs (bracketed hosts, bad encoding),
+    # and raw urlsplit raises on them. Dropping those rows here but keeping
+    # them during feature extraction would make this audit describe a different
+    # corpus than the one the model is trained on.
+    from .features import _safe_split
+
+    parsed = [_safe_split(u if "://" in u else "http://" + u) for u in df["url"]]
     frame = pd.DataFrame({
         "y": df["y"].to_numpy(),
         "is_https": [p.scheme == "https" for p in parsed],
@@ -337,11 +439,59 @@ def structural_degeneracy(df: pd.DataFrame) -> dict:
     out = {}
     for col in ("is_https", "has_www", "has_path", "has_query"):
         grouped = frame.groupby("y")[col].mean()
+        benign = float(grouped.get(0, float("nan")))
+        phishing = float(grouped.get(1, float("nan")))
+
+        separation = abs(benign - phishing)
+        # A tolerance rather than exact equality: a property present in 0.01%
+        # of one class is constant in substance, and calling it "ok" because it
+        # is not exactly zero would hide that the corpus carries no signal there.
+        both_absent = max(benign, phishing) <= 0.01
+        both_present = min(benign, phishing) >= 0.99
+
+        if both_absent or both_present:
+            verdict = "constant"
+        elif benign in (0.0, 1.0) and separation >= 0.05:
+            verdict = "degenerate"
+        elif separation >= 0.70:
+            verdict = "high_separation"
+        elif separation >= 0.35:
+            verdict = "elevated"
+        else:
+            verdict = "ok"
+
         out[col] = {
-            "benign": round(float(grouped.get(0, float("nan"))), 6),
-            "phishing": round(float(grouped.get(1, float("nan"))), 6),
+            "benign": round(benign, 6),
+            "phishing": round(phishing, 6),
+            "separation": round(separation, 6),
+            "verdict": verdict,
         }
     return out
+
+
+def properties_with_verdict(rates: dict, *verdicts: str) -> list[str]:
+    """Names of properties whose verdict is any of ``verdicts``."""
+    return [name for name, v in rates.items() if v.get("verdict") in verdicts]
+
+
+def degenerate_properties(rates: dict) -> list[str]:
+    """Properties that are a class label in disguise, by either pathology."""
+    return properties_with_verdict(rates, "degenerate", "high_separation")
+
+
+def constant_properties(rates: dict) -> list[str]:
+    """Properties the corpus has flattened away on both classes."""
+    return properties_with_verdict(rates, "constant")
+
+
+def max_single_property_tss(rates: dict) -> float:
+    """Best TSS achievable from one surface boolean alone.
+
+    A compact summary of how much of a corpus is solved before any learning: it
+    is the strongest single-feature baseline, and any model that does not
+    comfortably beat it has demonstrated nothing about the task.
+    """
+    return round(max((v["separation"] for v in rates.values()), default=0.0), 6)
 
 
 # --------------------------------------------------------------------------

@@ -135,30 +135,42 @@ function table(head, rows) {
 
 function renderComparison(comp) {
   if (!comp || comp.length < 2) return "";
-  const rows = comp.map(c => {
-    const deg = c.degenerate_properties.length
-      ? c.degenerate_properties.map(d => `<code>${esc(d)}</code>`).join(" ")
-      : `<span class="dim">none</span>`;
-    return [
-      {html:`<span class="strong">${esc(c.title)}</span>`},
-      {text:c.n.toLocaleString()},
-      {text:num(c.template_rule_tss, 4), cls: c.template_rule_tss > 0.5 ? "strong bad" : "strong good"},
-      {text:pct(c.benign_template_share)},
-      {html:deg},
-      {text:num(c.cell4_tss), cls:"strong"},
-    ];
-  });
-  return `<h2>Cross-benchmark comparison</h2>
-    <p>Two public corpora, one identical pipeline. The zero-parameter template rule
-    is applied <em>unchanged</em> to both — which is what makes this a comparison
-    rather than a bespoke accusation.</p>` +
-    table([{label:"Corpus"}, {label:"n", num:true}, {label:"Template-rule TSS", num:true},
-           {label:"Benign matching template", num:true}, {label:"Degenerate properties"},
-           {label:"Live TSS", num:true}], rows) +
-    `<p class="note">A corpus whose benign class can be identified by a regular
-     expression is not measuring phishing detection. A corpus where the same rule is
-     near-worthless is measuring something real, and is the control against which the
-     operational gap should be read.</p>`;
+  const chips = (list) => list && list.length
+    ? list.map(d => `<code>${esc(d)}</code>`).join(" ")
+    : `<span class="dim">—</span>`;
+  const rows = comp.map(c => [
+    {html:`<span class="strong">${esc(c.title)}</span>`},
+    {text:c.n.toLocaleString()},
+    {text:num(c.template_rule_tss, 4), cls: c.template_rule_tss >= 0.7 ? "strong bad" : "strong"},
+    {text:num(c.max_single_property_tss, 4), cls: c.max_single_property_tss >= 0.7 ? "strong bad" : "strong"},
+    {html:chips(c.degenerate_properties)},
+    {html:chips(c.constant_properties)},
+    {text:num(c.cell1_tss)},
+    {text:num(c.cell4_tss), cls:"strong"},
+  ]);
+  return `<h2>Cross-corpus comparison</h2>
+    <p>${comp.length} public corpora, one identical pipeline, the audits applied
+    <em>unchanged</em> to each — which is what makes this a comparison rather than a
+    bespoke accusation.</p>
+    <p class="note">Two zero-parameter baselines, because they catch different
+    pathologies. <strong>Template rule</strong> is the conjunction
+    <code>^https://www\\.[^/?#]+/?$</code> — high when <em>no</em> benign row deviates,
+    so combining surface properties identifies benign with perfect precision.
+    <strong>Best single property</strong> is the largest
+    <code>|P(prop|benign) − P(prop|phishing)|</code>, which is exactly the TSS of that
+    one boolean used as the entire classifier.</p>` +
+    table([{label:"Corpus"}, {label:"n", num:true}, {label:"Template rule", num:true},
+           {label:"Best single prop.", num:true}, {label:"Degenerate"}, {label:"Constant"},
+           {label:"Benchmark TSS", num:true}, {label:"Live TSS", num:true}], rows) +
+    `<p class="note"><strong>Neither baseline alone is sufficient.</strong> The template
+     rule scores 0.9897 on PhiUSIIL but only 0.1357 on Kaitholikkal — which would clear
+     the latter entirely, while a single boolean solves it at 0.9378. Conversely
+     PhiUSIIL's best single property is just 0.5865; its pathology lives only in the
+     conjunction. An audit has to run both.</p>
+     <p class="note">The result is not "benchmarks overstate performance". It is that
+     the gap varies enormously with how a corpus was assembled — from total collapse to
+     a survivable halving — and that cheap, label-free checks predict which kind you are
+     holding before any model is trained.</p>`;
 }
 
 function render(doc) {

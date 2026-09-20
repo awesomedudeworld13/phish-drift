@@ -75,13 +75,20 @@ def cmd_audit(args) -> int:
         print(f"  TSS         : {audit.tss:.4f}")
         print(f"  benign matching the template   : {audit.benign_template_share:.4f}")
         print(f"  phishing matching the template : {audit.phish_template_share:.4f}")
-        print(f"\n  {'property':<12} {'benign':>10} {'phishing':>10}")
+        print(f"\n  {'property':<12} {'benign':>9} {'phishing':>9} {'sep':>7}  verdict")
         for prop, vals in rates.items():
-            flag = "  <-- degenerate" if vals["benign"] in (0.0, 1.0) else ""
-            print(f"  {prop:<12} {vals['benign']:>10.4f} {vals['phishing']:>10.4f}{flag}")
+            mark = {"degenerate": " <--", "high_separation": " <--"}.get(vals["verdict"], "")
+            print(f"  {prop:<12} {vals['benign']:>9.4f} {vals['phishing']:>9.4f} "
+                  f"{vals['separation']:>7.4f}  {vals['verdict']}{mark}")
+        print(f"  best single-property TSS : {bm.max_single_property_tss(rates):.4f}")
 
-    print("\n  A rate of exactly 0.0000 or 1.0000 on one side means the property")
-    print("  is not a feature — it is the class label in a different alphabet.")
+    print("\n  'separation' is |P(prop|benign) - P(prop|phishing)|, which is exactly")
+    print("  the TSS of that one property used as the whole classifier.")
+    print("  degenerate      = extreme on the benign side; the conjunction of several")
+    print("                    such properties identifies benign with perfect precision.")
+    print("  high_separation = one property alone reaches TSS >= 0.70.")
+    print("  constant        = same extreme on both sides; information destroyed,")
+    print("                    so the corpus cannot teach a signal real deployments have.")
     return 0
 
 

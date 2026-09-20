@@ -1,7 +1,7 @@
 {
   "model_version": 1,
-  "trained_at_utc": "2026-09-20T19:18:26+00:00",
-  "git_commit": "799886928ebc6c31075ce236c5a0656a20dee771",
+  "trained_at_utc": "2026-09-20T19:34:43+00:00",
+  "git_commit": "048aaef5cebf0d19524506602ab5a6e520c8617e",
   "python": "3.12.10",
   "split_name": "domain_disjoint",
   "split_sizes": {
