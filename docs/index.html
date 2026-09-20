@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>phish-drift</title>
+<style>
+  :root {
+    --bg: #fbfbfa;  --panel: #ffffff;  --line: #e3e2df;
+    --ink: #1c1b19;  --muted: #6b6963;  --accent: #9a3412;
+    --good: #15803d; --bad: #b91c1c;
+    --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #161513; --panel: #1e1d1a; --line: #333029;
+      --ink: #eceae5; --muted: #9a968c; --accent: #fb923c;
+      --good: #4ade80; --bad: #f87171;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #161513; --panel: #1e1d1a; --line: #333029;
+    --ink: #eceae5; --muted: #9a968c; --accent: #fb923c;
+    --good: #4ade80; --bad: #f87171;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 880px; margin: 0 auto; padding: 3rem 1.25rem 5rem; }
+
+  header { border-bottom: 1px solid var(--line); padding-bottom: 1.75rem; margin-bottom: 2.5rem; }
+  h1 { font-size: 1.5rem; margin: 0 0 .4rem; letter-spacing: -.01em; }
+  .sub { color: var(--muted); margin: 0; font-size: .95rem; }
+  .stamp { color: var(--muted); font-size: .8rem; font-family: var(--mono); margin-top: .9rem; }
+
+  h2 {
+    font-size: .78rem; text-transform: uppercase; letter-spacing: .09em;
+    color: var(--muted); font-weight: 600;
+    margin: 2.75rem 0 .9rem; padding-bottom: .5rem; border-bottom: 1px solid var(--line);
+  }
+  p { margin: 0 0 1rem; }
+  .note { color: var(--muted); font-size: .88rem; }
+
+  .headline {
+    background: var(--panel); border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 6px; padding: 1.25rem 1.4rem; margin-bottom: .75rem;
+  }
+  .headline .big {
+    font-family: var(--mono); font-size: 2rem; font-weight: 600;
+    letter-spacing: -.02em; display: block; margin-bottom: .2rem;
+  }
+  .headline .cap { color: var(--muted); font-size: .9rem; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: .75rem; }
+
+  .scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; margin-bottom: .75rem; }
+  table { border-collapse: collapse; width: 100%; font-size: .9rem; min-width: 520px; }
+  th, td { text-align: left; padding: .6rem .7rem; border-bottom: 1px solid var(--line); }
+  th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; }
+  td.num, th.num { text-align: right; font-family: var(--mono); font-variant-numeric: tabular-nums; }
+  tbody tr:last-child td { border-bottom: none; }
+  .strong { font-weight: 600; }
+  .good { color: var(--good); } .bad { color: var(--bad); }
+  .dim { color: var(--muted); }
+
+  .bar { height: 7px; background: var(--line); border-radius: 4px; overflow: hidden; min-width: 90px; }
+  .bar > i { display: block; height: 100%; background: var(--accent); }
+
+  .flag {
+    border: 1px solid var(--line); border-left: 3px solid var(--bad);
+    background: var(--panel); border-radius: 6px; padding: 1rem 1.2rem; font-size: .92rem;
+  }
+  .flag h3 { margin: 0 0 .5rem; font-size: .95rem; }
+
+  footer { margin-top: 3.5rem; padding-top: 1.5rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .85rem; }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { font-family: var(--mono); font-size: .88em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>phish-drift</h1>
+    <p class="sub">How much of a phishing benchmark's score is detection skill, and how much is an artifact of how the dataset was built?</p>
+    <p class="stamp" id="stamp">loading…</p>
+  </header>
+
+  <main id="main"></main>
+
+  <footer>
+    Generated from <code>results.json</code>, rebuilt weekly by CI from the benchmark
+    archive and the committed daily snapshots. Nothing on this page is hand-entered.
+    <br>
+    <a href="https://github.com/awesomedudeworld13/phish-drift">Source and method</a>
+  </footer>
+</div>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const num = (v, d = 3) => (v === undefined || v === null || Number.isNaN(v)) ? "—" : Number(v).toFixed(d);
+const pct = (v, d = 1) => (v === undefined || v === null) ? "—" : (Number(v) * 100).toFixed(d) + "%";
+
+const CELL_LABEL = {
+  cell1_benchmark_random:       ["1", "Benchmark · random split", "the published protocol"],
+  cell2_benchmark_disjoint:     ["2", "Benchmark · domain-disjoint", "no eTLD+1 shared with training"],
+  cell3_live_templated_benign:  ["3", "Live · benign in template form", "era changes, construction held"],
+  cell4_live_realistic_benign:  ["4", "Live · realistic benign", "operational reality"],
+};
+
+const STEP_LABEL = {
+  split_leakage: "Split leakage",
+  temporal_adversarial_shift: "Temporal / adversarial drift",
+  benign_construction_artifact: "Benign construction artifact",
+  total: "Total",
+};
+
+function table(head, rows) {
+  return `<div class="scroll"><table><thead><tr>${
+    head.map(h => `<th class="${h.num ? "num" : ""}">${esc(h.label)}</th>`).join("")
+  }</tr></thead><tbody>${
+    rows.map(r => `<tr>${r.map((c, i) =>
+      `<td class="${head[i].num ? "num" : ""} ${c.cls || ""}">${c.html ?? esc(c.text ?? c)}</td>`
+    ).join("")}</tr>`).join("")
+  }</tbody></table></div>`;
+}
+
+function render(r) {
+  $("#stamp").textContent =
+    `generated ${r.generated_at_utc} · ${r.bootstrap_resamples.toLocaleString()} domain-clustered bootstrap resamples`;
+
+  const out = [];
+  const ta = r.construction_audit.template_rule;
+  const cells = r.cells || {};
+  const attr = (r.attribution_tss && r.attribution_tss.tss) || {};
+
+  // --- headline ---------------------------------------------------------
+  out.push(`<div class="grid">
+    <div class="headline">
+      <span class="big">${num(ta.tss, 4)}</span>
+      <span class="cap">TSS of a <strong>zero-parameter regex</strong> on the benchmark<br>
+      (accuracy ${num(ta.accuracy, 4)}, precision ${num(ta.precision, 4)})</span>
+    </div>
+    <div class="headline">
+      <span class="big ${cells.cell4_live_realistic_benign ? "bad" : ""}">${
+        cells.cell4_live_realistic_benign
+          ? num(cells.cell4_live_realistic_benign.operating_points.tss.tss)
+          : "—"}</span>
+      <span class="cap">TSS of the <strong>trained model on live data</strong><br>
+      against ${num(cells.cell1_benchmark_random?.operating_points.tss.tss)} on the benchmark</span>
+    </div>
+  </div>`);
+
+  // --- construction audit -----------------------------------------------
+  out.push(`<h2>1 · What the benchmark hands you before any learning</h2>`);
+  out.push(`<p>Every legitimate URL in the corpus matches the string template
+    <code>https://www.&lt;domain&gt;</code> — https, www-prefixed, no path, no query.
+    A rule with no learned parameters that simply tests for that template scores
+    <span class="strong">TSS ${num(ta.tss, 4)}</span>.</p>`);
+  out.push(table(
+    [{label:"Surface property"}, {label:"Legitimate", num:true}, {label:"Phishing", num:true}],
+    Object.entries(r.construction_audit.structural_rates).map(([k, v]) => {
+      const degenerate = v.benign === 0 || v.benign === 1;
+      return [
+        {html:`<code>${esc(k)}</code>`},
+        {text:num(v.benign, 4), cls: degenerate ? "strong bad" : ""},
+        {text:num(v.phishing, 4)},
+      ];
+    })
+  ));
+  out.push(`<p class="note">A rate of exactly 0.0000 or 1.0000 on one side means the
+    property is not a feature — it is the class label in a different alphabet.</p>`);
+
+  // --- cells -------------------------------------------------------------
+  out.push(`<h2>2 · The four cells</h2>`);
+  out.push(`<p>Each step changes <strong>exactly one thing</strong>, so the drop can be
+    attributed rather than merely observed.</p>`);
+  out.push(table(
+    [{label:"Cell"}, {label:"n", num:true}, {label:"Base rate", num:true},
+     {label:"TSS", num:true}, {label:"95% CI", num:true}],
+    Object.entries(cells).map(([k, c]) => {
+      const s = c.operating_points.tss || {};
+      const meta = CELL_LABEL[k] || [k, k, ""];
+      const ci = s.tss_ci95 ? `${num(s.tss_ci95[0])} – ${num(s.tss_ci95[1])}` : "—";
+      const cls = s.tss < 0.1 ? "strong bad" : (s.tss > 0.9 ? "strong" : "strong");
+      return [
+        {html:`<span class="strong">${esc(meta[1])}</span><br><span class="dim">${esc(meta[2])}</span>`},
+        {text:c.n.toLocaleString()},
+        {text:num(c.base_rate)},
+        {text:num(s.tss), cls},
+        {text:ci, cls:"dim"},
+      ];
+    })
+  ));
+
+  const c4 = cells.cell4_live_realistic_benign;
+  if (c4) {
+    const s = c4.operating_points.tss;
+    out.push(`<p class="note">Cell 4 is not degradation. The model labels
+      <strong>every</strong> URL phishing — ${s.tp.toLocaleString()} true positives,
+      ${s.fp.toLocaleString()} false positives, ${s.tn.toLocaleString()} true negatives.
+      Recall ${num(s.recall)}, false-alarm rate ${num(s.false_alarm_rate)}.</p>`);
+  }
+
+  // --- attribution --------------------------------------------------------
+  if (Object.keys(attr).length) {
+    out.push(`<h2>3 · Where the skill went</h2>`);
+    const total = Math.abs(attr.total || 1);
+    out.push(table(
+      [{label:"Step"}, {label:"ΔTSS", num:true}, {label:"Share", num:true}, {label:""}],
+      Object.entries(attr).filter(([k]) => k !== "total").map(([k, v]) => {
+        const share = Math.abs(v) / total;
+        return [
+          {text: STEP_LABEL[k] || k, cls: share > 0.5 ? "strong" : ""},
+          {text: num(v, 4)},
+          {text: pct(share)},
+          {html: `<div class="bar"><i style="width:${(share * 100).toFixed(1)}%"></i></div>`},
+        ];
+      }).concat([[
+        {text:"Total", cls:"strong"},
+        {text:num(attr.total, 4), cls:"strong"},
+        {text:"100.0%", cls:"strong"},
+        {html:""},
+      ]])
+    ));
+    if (r.total_gap_ci95) {
+      out.push(`<p class="note">Total gap ${num(r.total_gap_ci95.point_estimate)}
+        (95% CI ${num(r.total_gap_ci95.ci95[0])} – ${num(r.total_gap_ci95.ci95[1])});
+        excludes zero: <strong>${r.total_gap_ci95.excludes_zero}</strong>.</p>`);
+    }
+  }
+
+  // --- template rule across cells -----------------------------------------
+  if (r.template_rule_by_cell) {
+    out.push(`<h2>4 · The zero-parameter rule, scored everywhere</h2>`);
+    out.push(table(
+      [{label:"Cell"}, {label:"n", num:true}, {label:"Accuracy", num:true}, {label:"TSS", num:true}],
+      Object.entries(r.template_rule_by_cell).map(([k, s]) => [
+        {text:(CELL_LABEL[k] || [k, k])[1]},
+        {text:s.n.toLocaleString()},
+        {text:num(s.accuracy, 4)},
+        {text:num(s.tss, 4), cls: s.tss > 0.5 ? "strong" : "strong bad"},
+      ])
+    ));
+    out.push(`<p class="note">The rule that all but solves the benchmark is worthless —
+      in fact worse than chance — on live data.</p>`);
+  }
+
+  // --- robustness ----------------------------------------------------------
+  if (r.robustness && r.robustness.urlhaus_malware) {
+    const rb = r.robustness.urlhaus_malware, s = rb.operating_points.tss;
+    out.push(`<h2>5 · Robustness: a different positive class</h2>`);
+    out.push(`<p>URLhaus malware-distribution URLs instead of phishing, same
+      benchmark-trained model: <span class="strong bad">TSS ${num(s.tss)}</span>
+      over ${rb.n.toLocaleString()} URLs (recall ${num(s.recall)},
+      false-alarm rate ${num(s.false_alarm_rate)}). The collapse is a property of the
+      benchmark, not of one feed.</p>`);
+  }
+
+  // --- self-audit ----------------------------------------------------------
+  const sc = r.sampling_confound;
+  if (sc && sc.available) {
+    out.push(`<h2>6 · Audit of our own collection</h2>`);
+    if (sc.ceiling_breached) {
+      out.push(`<div class="flag">
+        <h3>⚠️ Pre-registered ceiling breached — reported, not resolved</h3>
+        <p>A model given <em>only</em> path-shape features separates our own live
+        classes at peak TSS <span class="strong">${num(sc.peak_tss_path_shape_only)}</span>,
+        above the ceiling of ${sc.preregistered_ceiling} committed before collection began.
+        We therefore withhold any claim about how much genuine phishing signal lives in
+        path structure.</p>
+        <p>It does not explain the collapse, and the measured direction is why:
+        <span class="strong">${pct(sc.path_presence_rate.benign)}</span> of benign URLs
+        carry a path against <span class="strong">${pct(sc.path_presence_rate.phishing)}</span>
+        of phishing ones. Benign URLs are the structurally deeper ones — the opposite of what
+        the benchmark teaches — so a model that learned "a path means phishing" is
+        anti-correlated with reality here, not merely uninformed. Re-sampling benign URLs
+        to be shallower would flatter the model, not penalise it. The reported collapse is
+        a lower bound.</p>
+      </div>`);
+    } else {
+      out.push(`<p>Path-shape features alone reach peak TSS
+        ${num(sc.peak_tss_path_shape_only)}, within the pre-registered ceiling of
+        ${sc.preregistered_ceiling}. Our two collection pipelines are structurally
+        indistinguishable.</p>`);
+    }
+  }
+
+  // --- corpus --------------------------------------------------------------
+  if (r.live_corpus) {
+    const lc = r.live_corpus;
+    out.push(`<h2>7 · Live corpus</h2>`);
+    out.push(`<p>${lc.n_rows.toLocaleString()} unique URLs over
+      ${lc.n_domains.toLocaleString()} registrable domains,
+      ${lc.n_phishing.toLocaleString()} phishing${
+        lc.span ? `, spanning ${esc(lc.span[0])} → ${esc(lc.span[1])}` : ""}.
+      Snapshots are committed before they are scored, so the record is prospective
+      by construction.</p>`);
+    out.push(table(
+      [{label:"Source"}, {label:"Rows", num:true}],
+      Object.entries(lc.by_source).map(([k, v]) => [{html:`<code>${esc(k)}</code>`}, {text:v.toLocaleString()}])
+    ));
+  }
+
+  $("#main").innerHTML = out.join("");
+}
+
+fetch("results.json", { cache: "no-store" })
+  .then(r => { if (!r.ok) throw new Error(`results.json → HTTP ${r.status}`); return r.json(); })
+  .then(render)
+  .catch(err => {
+    $("#stamp").textContent = "";
+    $("#main").innerHTML =
+      `<div class="flag"><h3>Could not load results</h3><p>${esc(err.message)}</p>
+       <p class="note">The report has not been generated yet. Run
+       <code>python -m phishdrift.cli report</code>, or wait for the weekly CI rebuild.</p></div>`;
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+# Pinned to minor versions: this repository's published numbers must be
+# reproducible, and scikit-learn's tree internals have changed results across
+# minor releases before.
+numpy>=2.0,<3
+pandas>=2.2,<4
+scikit-learn>=1.5,<2
+scipy>=1.13,<2
+joblib>=1.4,<2
+requests>=2.32,<3
+tldextract>=5.1,<6

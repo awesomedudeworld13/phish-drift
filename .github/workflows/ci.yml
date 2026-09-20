@@ -1,0 +1,72 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install --quiet -r requirements.txt
+
+      # These guard the invariants the experiment depends on: a fixed feature
+      # schema, offline extraction, a correct eTLD+1, a genuinely disjoint
+      # domain split, and thresholds chosen on the right partition.
+      - name: Invariant checks
+        run: python tests/test_features.py
+
+      - name: Cache benchmark archive
+        uses: actions/cache@v4
+        with:
+          path: data/phiusiil.zip
+          key: phiusiil-v1
+
+      # The construction audit is the project's headline and has no learned
+      # parameters, so it must reproduce exactly on every commit. If this number
+      # moves, either the corpus changed upstream or we broke the loader.
+      - name: Construction audit reproduces
+        run: |
+          python -m phishdrift.cli audit | tee audit.txt
+          grep -q "TSS         : 0.9897" audit.txt || {
+            echo "::error::Construction audit TSS changed; expected 0.9897"
+            exit 1
+          }
+
+      - name: Live snapshots are well formed
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          import pandas as pd
+
+          files = sorted(Path("data/live").glob("*.csv.gz"))
+          if not files:
+              print("No snapshots yet; skipping.")
+              sys.exit(0)
+
+          required = {"url", "y", "source", "first_seen_utc"}
+          seen_dates = []
+          for f in files:
+              frame = pd.read_csv(f)
+              missing = required - set(frame.columns)
+              assert not missing, f"{f.name}: missing columns {missing}"
+              assert frame.y.isin([0, 1]).all(), f"{f.name}: label not in {{0,1}}"
+              assert not frame.url.isna().any(), f"{f.name}: null URL"
+              assert frame.url.is_unique, f"{f.name}: duplicate URLs within a snapshot"
+              seen_dates.append(f.name.removesuffix(".csv.gz"))
+
+          assert len(seen_dates) == len(set(seen_dates)), "duplicate snapshot dates"
+          print(f"{len(files)} snapshots OK, {seen_dates[0]} .. {seen_dates[-1]}")
+          PY

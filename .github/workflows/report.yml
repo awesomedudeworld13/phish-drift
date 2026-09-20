@@ -1,0 +1,79 @@
+name: report
+
+# Weekly: rebuild every number in RESULTS.md from scratch.
+#
+# Models are NOT committed to the repository (~30 MB of forest). They are
+# retrained here from a fixed seed on each run, which costs a few minutes and
+# buys something more valuable than the time: every published figure is
+# regenerated end to end from the benchmark archive and the committed
+# snapshots, so a stale artifact cannot silently survive a code change.
+#
+# RESULTS.md is generated, never hand-edited. If this job's diff ever shows a
+# change nobody made to the code or the data, that is a bug worth chasing.
+
+on:
+  schedule:
+    - cron: "40 7 * * 1"          # Mondays, after Monday's collect run
+  workflow_dispatch:
+    inputs:
+      resamples:
+        description: "Bootstrap resamples"
+        required: false
+        default: "1000"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: report
+  cancel-in-progress: false
+
+jobs:
+  rebuild:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install --quiet -r requirements.txt
+
+      - name: Cache benchmark archive
+        uses: actions/cache@v4
+        with:
+          path: data/phiusiil.zip
+          key: phiusiil-v1
+
+      - name: Invariant checks
+        run: python tests/test_features.py
+
+      - name: Train
+        run: python -m phishdrift.cli train
+
+      - name: Report
+        run: |
+          python -m phishdrift.cli report \
+            --resamples "${{ github.event.inputs.resamples || '1000' }}"
+
+      - name: Commit results
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add RESULTS.md results.json docs/results.json
+          if git diff --cached --quiet; then
+            echo "Results unchanged."
+            exit 0
+          fi
+          git commit -m "results: rebuild $(date -u +%F)"
+          for attempt in 1 2 3; do
+            git pull --rebase --autostash origin "${GITHUB_REF_NAME}" && \
+              git push origin "HEAD:${GITHUB_REF_NAME}" && exit 0
+            echo "push attempt $attempt failed; retrying"
+            sleep 5
+          done
+          exit 1
