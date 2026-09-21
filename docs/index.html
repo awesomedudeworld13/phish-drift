@@ -83,10 +83,28 @@
   code { font-family: var(--mono); font-size: .88em; }
   select { font: inherit; padding: .4rem .6rem; border: 1px solid var(--line);
            border-radius: 5px; background: var(--panel); color: var(--ink); }
+
+  .domains { display: flex; flex-wrap: wrap; gap: .15rem; align-items: center;
+             border-bottom: 1px solid var(--line); margin-bottom: 2rem; }
+  .domains a { padding: .55rem .8rem; font-size: .88rem; color: var(--muted);
+               text-decoration: none; border-bottom: 2px solid transparent; margin-bottom: -1px; }
+  .domains a:hover { color: var(--ink); text-decoration: none; }
+  .domains a[aria-current="page"] { color: var(--ink); font-weight: 600;
+                                    border-bottom-color: var(--accent); }
+  .domains .tag { margin-left: auto; font-size: .74rem; color: var(--muted);
+                  letter-spacing: .05em; text-transform: uppercase; padding: 0 .2rem; }
+  @media (max-width: 560px) { .domains .tag { display: none; } }
 </style>
+<script src="charts.js"></script>
 </head>
 <body>
 <div class="wrap">
+  <nav class="domains" aria-label="Domains in this study">
+      <a href="https://awesomedudeworld13.github.io/phish-drift/" aria-current="page">Phishing URLs</a>
+      <a href="https://awesomedudeworld13.github.io/ozone-drift/">Houston smog</a>
+      <a href="https://awesomedudeworld-helios.hf.space/">Solar flares &amp; storms</a>
+      <span class="tag">one study · one scoring code</span>
+  </nav>
   <header>
     <h1>phish-drift</h1>
     <p class="sub">How much of a phishing benchmark's score is detection skill, and how much is an artifact of how the dataset was built?</p>
@@ -108,6 +126,13 @@ const $ = (s) => document.querySelector(s);
 const esc = (s) => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const num = (v, d = 3) => (v === undefined || v === null || Number.isNaN(v)) ? "—" : Number(v).toFixed(d);
 const pct = (v, d = 1) => (v === undefined || v === null) ? "—" : (Number(v) * 100).toFixed(d) + "%";
+const sgn = (v, d = 3) => (v === undefined || v === null) ? "—" : (v >= 0 ? "+" : "") + Number(v).toFixed(d);
+
+// collection.json is rewritten by the daily collect job, results.json only by
+// the weekly rebuild, so the growth chart tracks collection rather than scoring.
+let TIMELINE = null;
+const CELL_ORDER = ["cell1_benchmark_random", "cell2_benchmark_disjoint",
+                    "cell3_live_templated_benign", "cell4_live_realistic_benign"];
 
 const CELL_LABEL = {
   cell1_benchmark_random:       ["1", "Benchmark · random split", "the published protocol"],
@@ -121,6 +146,13 @@ const STEP_LABEL = {
   temporal_adversarial_shift: "Temporal / adversarial drift",
   benign_construction_artifact: "Benign construction artifact",
   total: "Total",
+};
+
+// Shorter forms for chart axes, where the full name wraps off the end.
+const STEP_SHORT = {
+  split_leakage: "Split leakage",
+  temporal_adversarial_shift: "Real-world drift",
+  benign_construction_artifact: "Construction artifact",
 };
 
 function table(head, rows) {
@@ -173,7 +205,8 @@ function renderComparison(comp) {
      holding before any model is trained.</p>`;
 }
 
-function render(doc) {
+function render(doc, timeline) {
+  TIMELINE = timeline;
   const keys = Object.keys(doc.benchmarks || {});
   $("#stamp").textContent =
     `generated ${doc.generated_at_utc} · ${keys.length} benchmark${keys.length === 1 ? "" : "s"}`;
@@ -263,6 +296,45 @@ function renderBenchmark(r) {
     })
   ));
 
+  const present = CELL_ORDER.filter(k => cells[k]);
+  if (present.length >= 2) {
+    const pts = present.map(k => cells[k].operating_points.tss);
+    const spread = pts.flatMap(s => [s.tss, ...(s.tss_ci95 || [])]);
+    out.push(chartBars({
+      items: present.map((k, i) => {
+        const s = pts[i], meta = CELL_LABEL[k] || [k, k, ""];
+        return { label: meta[1].split("·").pop().trim(), sub: `cell ${meta[0]}`,
+                 value: s.tss, ci: s.tss_ci95, tone: s.tss < 0.15 ? "bad" : "accent" };
+      }),
+      domain: [Math.min(0, ...spread) - 0.06, Math.max(1, ...spread) + 0.06],
+      yLabel: "TSS", height: 310, aria: "TSS by cell, with confidence intervals",
+      caption: `Whiskers are 95% confidence intervals from
+        ${r.bootstrap_resamples.toLocaleString()} bootstrap resamples that resample whole
+        <strong>registrable domains</strong>, not rows. Resampling rows independently would
+        treat 200 URLs hosted on one compromised site as 200 observations and report an
+        interval several times too narrow. The horizontal rule at zero is a model with no
+        skill at all.`,
+    }));
+
+    out.push(chartScatter({
+      points: present.map((k, i) => {
+        const s = pts[i], meta = CELL_LABEL[k] || [k, k, ""];
+        return { x: s.false_alarm_rate, y: s.recall,
+                 label: `cell ${meta[0]} · TSS ${num(s.tss)}`,
+                 tone: s.tss < 0.15 ? "bad" : "accent" };
+      }),
+      xLabel: "false-alarm rate — clean URLs wrongly flagged",
+      yLabel: "recall — phishing caught",
+      aria: "recall against false-alarm rate for each cell",
+      caption: `The same four cells, plotted by what the model actually <em>does</em> rather
+        than by one summary number. Up and to the left is a useful detector. The dashed
+        diagonal is chance: every point on it has TSS 0, whether it flags nothing or flags
+        everything. A cell sitting in the <strong>top-right corner</strong> has not become
+        a worse detector so much as stopped detecting — it says "phishing" to every URL it
+        is shown, catching all of them and alarming on all of them.`,
+    }));
+  }
+
   const c4 = cells.cell4_live_realistic_benign;
   if (c4) {
     const s = c4.operating_points.tss;
@@ -275,6 +347,36 @@ function renderBenchmark(r) {
   // --- attribution --------------------------------------------------------
   if (Object.keys(attr).length) {
     out.push(`<h2>3 · Where the skill went</h2>`);
+
+    // Only drawn when the data-driven guard licensed the full decomposition.
+    // A partial waterfall would leave an unexplained drop between its last step
+    // and the final cell, and read as if that drop had been attributed.
+    if (r.attribution_applicable && r.attribution_applicable.full_decomposition) {
+      const tssOf = (k) => cells[k] && cells[k].operating_points.tss.tss;
+      const steps = (r.attribution_steps || []).filter(st => cells[st.from] && cells[st.to]);
+      const first = CELL_ORDER.find(k => cells[k]);
+      const last = [...CELL_ORDER].reverse().find(k => cells[k]);
+      const items = [{ label: "Benchmark score", sub: "cell 1", value: tssOf(first), tone: "accent" }];
+      for (const st of steps) {
+        items.push({
+          label: STEP_SHORT[st.step] || STEP_LABEL[st.step] || st.step,
+          value: tssOf(st.to), from: tssOf(st.from), tone: "bad",
+          display: sgn(tssOf(st.to) - tssOf(st.from)),
+        });
+      }
+      items.push({ label: "What survives", sub: "cell 4", value: tssOf(last),
+                   tone: tssOf(last) < 0.15 ? "bad" : "accent" });
+      out.push(chartBars({
+        items, yLabel: "TSS", height: 320, slot: 118,
+        domain: [Math.min(0, tssOf(last)) - 0.06, Math.max(1, tssOf(first)) + 0.06],
+        aria: "waterfall of TSS lost at each step",
+        caption: `Each floating bar is one step of the chain, and each step changes
+          <strong>exactly one thing</strong> — which is what makes the loss attributable
+          rather than merely observed. The first and last bars are the measured scores;
+          everything between them is accounting.`,
+      }));
+    }
+
     const total = Math.abs(attr.total || 1);
     out.push(table(
       [{label:"Step"}, {label:"ΔTSS", num:true}, {label:"Share", num:true}, {label:""}],
@@ -316,10 +418,32 @@ function renderBenchmark(r) {
       in fact worse than chance — on live data.</p>`);
   }
 
+  // --- what the model learned ---------------------------------------------
+  const md = r.models && r.models.domain_disjoint;
+  if (md && md.top_features) {
+    const sz = md.split_sizes || {};
+    out.push(`<h2>5 · What the model learned</h2>`);
+    out.push(`<p>A random forest of ${md.hyperparameters.n_estimators} trees over
+      ${md.n_features} features computed from the URL string alone — no page fetch, no
+      WHOIS lookup, no vocabulary fitted on the data. Trained on
+      ${(sz.train || 0).toLocaleString()} URLs, threshold frozen on a separate
+      ${(sz.val || 0).toLocaleString()}, scored on ${(sz.test || 0).toLocaleString()} it
+      never saw, with no registrable domain appearing on two sides of the split.</p>`);
+    out.push(chartBarsH({
+      items: md.top_features.slice(0, 12).map(f => ({ label: f.name, value: f.importance })),
+      aria: "feature importance",
+      caption: `How much each input contributed to the forest's decisions. This is the
+        honest answer to "what is it detecting?" — and for a corpus whose benign class is a
+        string template, the answer is the template: <code>is_https</code>,
+        <code>has_www</code> and the absence of a path are surface properties of how the
+        rows were <em>collected</em>, not of what phishing looks like.`,
+    }));
+  }
+
   // --- robustness ----------------------------------------------------------
   if (r.robustness && r.robustness.urlhaus_malware) {
     const rb = r.robustness.urlhaus_malware, s = rb.operating_points.tss;
-    out.push(`<h2>5 · Robustness: a different positive class</h2>`);
+    out.push(`<h2>6 · Robustness: a different positive class</h2>`);
     out.push(`<p>URLhaus malware-distribution URLs instead of phishing, same
       benchmark-trained model: <span class="strong bad">TSS ${num(s.tss)}</span>
       over ${rb.n.toLocaleString()} URLs (recall ${num(s.recall)},
@@ -330,7 +454,7 @@ function renderBenchmark(r) {
   // --- self-audit ----------------------------------------------------------
   const sc = r.sampling_confound;
   if (sc && sc.available) {
-    out.push(`<h2>6 · Audit of our own collection</h2>`);
+    out.push(`<h2>7 · Audit of our own collection</h2>`);
     if (sc.ceiling_breached) {
       out.push(`<div class="flag">
         <h3>⚠️ Pre-registered ceiling breached — reported, not resolved</h3>
@@ -359,7 +483,7 @@ function renderBenchmark(r) {
   // --- corpus --------------------------------------------------------------
   if (r.live_corpus) {
     const lc = r.live_corpus;
-    out.push(`<h2>7 · Live corpus</h2>`);
+    out.push(`<h2>8 · Live corpus</h2>`);
     out.push(`<p>${lc.n_rows.toLocaleString()} unique URLs over
       ${lc.n_domains.toLocaleString()} registrable domains,
       ${lc.n_phishing.toLocaleString()} phishing${
@@ -370,14 +494,70 @@ function renderBenchmark(r) {
       [{label:"Source"}, {label:"Rows", num:true}],
       Object.entries(lc.by_source).map(([k, v]) => [{html:`<code>${esc(k)}</code>`}, {text:v.toLocaleString()}])
     ));
+    out.push(renderGrowth());
   }
 
   return out.join("");
 }
 
-fetch("results.json", { cache: "no-store" })
-  .then(r => { if (!r.ok) throw new Error(`results.json → HTTP ${r.status}`); return r.json(); })
-  .then(render)
+function renderGrowth() {
+  const t = TIMELINE;
+  if (!t || !t.days || !t.days.length) return "";
+  const days = t.days;
+  const labels = days.map(d => d.date.slice(5));
+  const kfmt = v => Math.abs(v) >= 1000 ? (v / 1000).toFixed(1) + "k" : String(Math.round(v));
+  const out = [];
+
+  out.push(chartLine({
+    series: [
+      { name: "URLs", values: days.map(d => d.cumulative_rows), tone: "accent" },
+      { name: "phishing", values: days.map(d => d.cumulative_phishing), tone: "bad" },
+      { name: "registrable domains", values: days.map(d => d.cumulative_domains), tone: "muted" },
+    ],
+    labels, fmt: kfmt, yLabel: "cumulative, deduplicated", height: 270,
+    aria: "growth of the live corpus",
+    caption: `Every snapshot is committed to the repository before it is scored, so this
+      record is prospective by construction — it cannot be trimmed after the fact. Counts
+      are <strong>deduplicated across days</strong>: a campaign that OpenPhish reports for a
+      week is credited to the day it first appeared, not to seven days, so the line measures
+      distinct URLs rather than feed impressions.`,
+  }));
+
+  out.push(chartLine({
+    series: [
+      { name: "new URLs that day", values: days.map(d => d.new_rows), tone: "accent" },
+      { name: "of those, phishing", values: days.map(d => d.new_phishing), tone: "bad" },
+    ],
+    labels, fmt: kfmt, yLabel: "new rows", height: 220,
+    aria: "new rows collected each day",
+    caption: `The daily intake, after removing URLs already seen. The first snapshot counts
+      in full; later ones contribute only what is genuinely new, which is why the series
+      drops and then settles — that difference is the feeds' turnover rate, measured rather
+      than assumed.`,
+  }));
+
+  const need = (t.readiness && t.readiness.days_required) || 14;
+  const have = t.n_days || 0;
+  const doneCls = have >= need ? "good" : "";
+  out.push(`<p class="note" style="margin-top:1.25rem"><strong>Question 2 — does training on
+    live data close the gap?</strong> Answering it needs a temporal split of the live record:
+    ${t.readiness.min_train_days} days to train on and ${t.readiness.min_holdout_days} held
+    out, ${need} in total. <span class="strong ${doneCls}">${have} of ${need}</span> banked
+    as of ${esc(t.generated_at_utc.slice(0, 10))}. Until then the question is reported as
+    open rather than answered from too little data.</p>
+    <div class="bar" style="height:10px"><i style="width:${Math.min(100, have / need * 100).toFixed(1)}%"></i></div>`);
+
+  return out.join("");
+}
+
+Promise.all([
+  fetch("results.json", { cache: "no-store" })
+    .then(r => { if (!r.ok) throw new Error(`results.json → HTTP ${r.status}`); return r.json(); }),
+  // Optional: the dashboard still renders in full without the growth series.
+  fetch("collection.json", { cache: "no-store" })
+    .then(r => r.ok ? r.json() : null).catch(() => null),
+])
+  .then(([doc, timeline]) => render(doc, timeline))
   .catch(err => {
     $("#stamp").textContent = "";
     $("#main").innerHTML =

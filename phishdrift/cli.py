@@ -26,6 +26,7 @@ MODELS = ROOT / "models"
 RESULTS_DIR = ROOT / "results"
 RESULTS_MD = ROOT / "RESULTS.md"
 DOCS_JSON = ROOT / "docs" / "results.json"
+DOCS_TIMELINE = ROOT / "docs" / "collection.json"
 LIVE_DIR = DATA / "live"
 
 SEED = 20260920
@@ -124,7 +125,21 @@ def cmd_collect(args) -> int:
     path = live_collect.write_snapshot(snap, LIVE_DIR)
     print(f"[collect] {snap.date}: {json.dumps(snap.stats)}")
     print(f"[collect] -> {path.relative_to(ROOT)}")
+    _write_timeline()
     return 0
+
+
+def _write_timeline() -> dict:
+    """Refresh the dashboard's growth series.
+
+    Cheap enough to run after every daily snapshot, which is the point: the
+    growth chart should track collection, not wait for the weekly rebuild.
+    """
+    doc = live_collect.timeline(LIVE_DIR)
+    DOCS_TIMELINE.parent.mkdir(parents=True, exist_ok=True)
+    DOCS_TIMELINE.write_text(json.dumps(doc, indent=2), encoding="utf-8")
+    print(f"[timeline] {doc['n_days']} day(s) -> {DOCS_TIMELINE.relative_to(ROOT)}")
+    return doc
 
 
 def cmd_report(args) -> int:
@@ -171,7 +186,8 @@ def cmd_report(args) -> int:
     RESULTS_MD.write_text(gap.render_markdown(document), encoding="utf-8")
     DOCS_JSON.parent.mkdir(parents=True, exist_ok=True)
     DOCS_JSON.write_text(json.dumps(document, indent=2), encoding="utf-8")
-    print(f"\n[report] -> results/*.json, RESULTS.md, docs/results.json")
+    _write_timeline()
+    print("\n[report] -> results/*.json, RESULTS.md, docs/results.json, docs/collection.json")
     return 0
 
 

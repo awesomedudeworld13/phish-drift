@@ -245,6 +245,47 @@ def test_cluster_bootstrap_is_wider_than_iid():
     assert (hi_c - lo_c) > (hi_i - lo_i), "clustered CI was not wider than i.i.d."
 
 
+def test_timeline_counts_each_url_once_across_days():
+    """The growth chart must plot distinct URLs, not feed impressions.
+
+    OpenPhish rotates a fixed-size window, so the same URL is reported for
+    several consecutive days. If the cumulative series counted every appearance
+    the corpus would look like it were growing while nothing new arrived.
+    """
+    import gzip, json, tempfile
+    from phishdrift import collect as live_collect
+
+    repeated = "http://repeat.example.com/login"
+    days = {
+        # Distinct registrable domains, deliberately: a subdomain of
+        # example.com would collapse onto it and make the domain count a
+        # no-op rather than a check.
+        "2026-01-01": [(repeated, 1), ("http://new-a.alpha.com/x", 1),
+                       ("https://www.benign-a.com", 0)],
+        "2026-01-02": [(repeated, 1), ("http://new-b.beta.com/y", 1)],
+    }
+    with tempfile.TemporaryDirectory() as tmp:
+        live_dir = Path(tmp)
+        for date, rows in days.items():
+            with gzip.open(live_dir / f"{date}.csv.gz", "wt", encoding="utf-8", newline="") as fh:
+                fh.write("url,y,source,first_seen_utc\n")
+                for url, y in rows:
+                    fh.write(f"{url},{y},openphish,{date}T00:00:00+00:00\n")
+            (live_dir / f"{date}.stats.json").write_text(json.dumps({"date": date}))
+
+        doc = live_collect.timeline(live_dir)
+
+    assert doc["n_days"] == 2, doc["n_days"]
+    first, second = doc["days"]
+    assert first["new_rows"] == 3, first
+    # Day two collected two rows but only one of them had never been seen.
+    assert second["new_rows"] == 1, second
+    assert second["cumulative_rows"] == 4, second
+    assert second["cumulative_phishing"] == 3, second
+    assert first["cumulative_domains"] == 3, first
+    assert second["cumulative_domains"] == 4, second
+
+
 def _run_all():
     failures = 0
     for name, fn in sorted(globals().items()):
