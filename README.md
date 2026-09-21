@@ -184,11 +184,12 @@ Other honest limits:
 
 This is one of several test cases in a study asking whether a benchmark score overstates real performance, and whether that depends on **what kind of change** the model faces between testing and deployment:
 
-| Domain | What changes | Inflation from shuffling | Real-world drift | Total |
+| Domain | What changes between testing and the real world | Inflation from shuffling | Real-world drift | **Total** |
 |---|---|---|---|---|
-| [Ozone](https://github.com/awesomedudeworld13/ozone-drift) | seasons and weather — nothing adversarial | +0.215 | **−0.077** | **+0.138** |
+| [Ozone / smog](https://github.com/awesomedudeworld13/ozone-drift) | seasons and weather — nothing adversarial | +0.215 | **−0.077** | **+0.138** |
 | [Solar flares](https://github.com/solarflarepredictor-cmd/SolarFlarePredictor) | the Sun's 11-year cycle | +0.118 | +0.107 | **+0.225** |
-| **Phishing** (this repo) | attackers actively adapting, plus broken datasets | +0.0001 to +0.088 | +0.009 | **+0.508 to +0.996** |
+| [Geomagnetic storms](https://github.com/solarflarepredictor-cmd/SolarFlarePredictor) | multi-day space-weather disturbances | +0.325 | +0.071 | **+0.396** |
+| **Phishing URLs** (this repo) | attackers adapting, plus broken datasets | +0.0001 to +0.088 | +0.009 | **+0.508 to +0.996** |
 
 Phishing is the extreme case: the only domain where someone is actively working against the model, and the only one where we found datasets that don't measure the task at all. Ozone is the control at the other end. All three now use a character-for-character identical copy of the same scoring code, which is what makes putting them in one table legitimate.
 
