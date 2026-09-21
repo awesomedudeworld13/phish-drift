@@ -1,0 +1,41 @@
+{
+  "generated_at_utc": "2026-09-21T23:05:34+00:00",
+  "n_days": 2,
+  "days": [
+    {
+      "date": "2026-09-20",
+      "new_rows": 2868,
+      "new_phishing": 2300,
+      "cumulative_rows": 2868,
+      "cumulative_phishing": 2300,
+      "cumulative_domains": 1386,
+      "by_source": {
+        "urlhaus": 2000,
+        "openphish": 300,
+        "tranco_templated": 300,
+        "commoncrawl": 268
+      }
+    },
+    {
+      "date": "2026-09-21",
+      "new_rows": 1463,
+      "new_phishing": 885,
+      "cumulative_rows": 4331,
+      "cumulative_phishing": 3185,
+      "cumulative_domains": 2086,
+      "by_source": {
+        "urlhaus": 585,
+        "openphish": 300,
+        "tranco_templated": 296,
+        "commoncrawl": 282
+      }
+    }
+  ],
+  "readiness": {
+    "min_train_days": 10,
+    "min_holdout_days": 4,
+    "min_rows_per_side": 400,
+    "min_positives_per_side": 100,
+    "days_required": 14
+  }
+}

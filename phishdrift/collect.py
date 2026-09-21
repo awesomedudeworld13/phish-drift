@@ -297,3 +297,55 @@ def load_live(live_dir: Path = Path("data/live"),
     from .features import registrable_domain
     out["domain"] = [registrable_domain(u) for u in out["url"]]
     return out.reset_index(drop=True)
+
+
+def timeline(live_dir: Path = Path("data/live")) -> dict:
+    """Per-day record of the live corpus, for the dashboard's growth chart.
+
+    Counts are of *new* rows. ``load_live`` keeps a URL's first appearance, so a
+    campaign that OpenPhish reports on five consecutive days is attributed to
+    the first day only — which makes the cumulative series an honest count of
+    distinct URLs rather than a running total of feed impressions.
+
+    This is written by ``collect`` as well as ``report`` so the growth chart
+    tracks the daily job rather than the weekly rebuild.
+    """
+    from .livetrain import (MIN_HOLDOUT_DAYS, MIN_POSITIVES_PER_SIDE,
+                            MIN_ROWS_PER_SIDE, MIN_TRAIN_DAYS)
+
+    live = load_live(live_dir)
+    days: list[dict] = []
+    seen_domains: set[str] = set()
+    cumulative = 0
+    cumulative_phishing = 0
+
+    if not live.empty:
+        for date, part in live.groupby("snapshot_date", sort=True):
+            seen_domains.update(part["domain"].dropna())
+            cumulative += len(part)
+            cumulative_phishing += int(part["y"].sum())
+            days.append({
+                "date": str(date),
+                "new_rows": int(len(part)),
+                "new_phishing": int(part["y"].sum()),
+                "cumulative_rows": cumulative,
+                "cumulative_phishing": cumulative_phishing,
+                "cumulative_domains": len(seen_domains),
+                "by_source": {str(k): int(v)
+                              for k, v in part["source"].value_counts().items()},
+            })
+
+    return {
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "n_days": len(days),
+        "days": days,
+        # Frozen before collection began; drawn on the chart as the point at
+        # which question 2 becomes answerable.
+        "readiness": {
+            "min_train_days": MIN_TRAIN_DAYS,
+            "min_holdout_days": MIN_HOLDOUT_DAYS,
+            "min_rows_per_side": MIN_ROWS_PER_SIDE,
+            "min_positives_per_side": MIN_POSITIVES_PER_SIDE,
+            "days_required": MIN_TRAIN_DAYS + MIN_HOLDOUT_DAYS,
+        },
+    }

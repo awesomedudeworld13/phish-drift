@@ -72,14 +72,14 @@ jobs:
           # pathspec error after the work is already done -- which is exactly
           # how this step broke when results.json became the results/ directory.
           missing=""
-          for p in RESULTS.md results docs/results.json; do
+          for p in RESULTS.md results docs/results.json docs/collection.json; do
             [ -e "$p" ] || missing="$missing $p"
           done
           if [ -n "$missing" ]; then
             echo "::error::report finished but expected output(s) missing:$missing"
             exit 1
           fi
-          git add RESULTS.md results docs/results.json
+          git add RESULTS.md results docs/results.json docs/collection.json
           if git diff --cached --quiet; then
             echo "Results unchanged."
             exit 0
