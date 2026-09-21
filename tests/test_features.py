@@ -23,7 +23,7 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from phishdrift import evaluate                                    # noqa: E402
+from benchgap import evaluate                                    # noqa: E402
 from phishdrift.benchmark import (                                 # noqa: E402
     BENCHMARKS, BENIGN_TEMPLATE, Split, domain_disjoint_split, random_split,
     template_audit, verify_vendored,

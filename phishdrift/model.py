@@ -19,7 +19,7 @@ from pathlib import Path
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 
-from . import evaluate
+from benchgap import evaluate
 from .benchmark import BENIGN_TEMPLATE, Split
 from .features import FEATURE_NAMES, feature_matrix
 

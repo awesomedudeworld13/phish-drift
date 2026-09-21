@@ -44,7 +44,7 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-from . import evaluate
+from benchgap import evaluate
 from .benchmark import Split
 from .model import TrainedModel, train as train_model
 
