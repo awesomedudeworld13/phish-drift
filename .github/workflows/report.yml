@@ -66,7 +66,20 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add RESULTS.md results.json docs/results.json
+          # The report writes several files; name them explicitly so a rename
+          # can never silently stop one being published. Checked first, because
+          # `git add` on a missing path aborts the whole job with a cryptic
+          # pathspec error after the work is already done -- which is exactly
+          # how this step broke when results.json became the results/ directory.
+          missing=""
+          for p in RESULTS.md results docs/results.json; do
+            [ -e "$p" ] || missing="$missing $p"
+          done
+          if [ -n "$missing" ]; then
+            echo "::error::report finished but expected output(s) missing:$missing"
+            exit 1
+          fi
+          git add RESULTS.md results docs/results.json
           if git diff --cached --quiet; then
             echo "Results unchanged."
             exit 0
