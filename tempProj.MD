@@ -81,4 +81,4 @@ It exists mainly to get one thing right that's routinely got wrong: **confidence
 
 ---
 
-<sub>Also: <a href="https://github.com/awesomedudeworld13/defi-threat-monitor">defi-threat-monitor</a> · <a href="https://github.com/awesomedudeworld13/tinyeconomy">tinyeconomy</a></sub>
+<sub>Secret message kachow</sub>
