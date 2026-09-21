@@ -51,7 +51,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
-from . import evaluate
+from benchgap import evaluate
 from .benchmark import Split, structural_degeneracy, template_audit
 from .features import PATH_SHAPE_FEATURES, FEATURE_NAMES, feature_matrix
 from .model import TemplateRule, TrainedModel
