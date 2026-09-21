@@ -8,7 +8,6 @@ scipy>=1.13,<2
 joblib>=1.4,<2
 requests>=2.32,<3
 tldextract>=5.1,<6
-# The shared evaluation harness. Pinned to git until 0.1.0 is on PyPI; swap to
-# 'benchgap>=0.1.0' once it is. Every domain in this study must score with the
+# The shared evaluation harness. Every domain in this study must score with the
 # same code, which is the whole reason it is a package and not a copied file.
-benchgap @ git+https://github.com/awesomedudeworld13/benchgap@main
+benchgap>=0.1.0
