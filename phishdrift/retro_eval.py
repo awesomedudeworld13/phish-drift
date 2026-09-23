@@ -18,7 +18,7 @@ import pandas as pd
 from sklearn.ensemble import HistGradientBoostingClassifier
 
 from benchgap import evaluate
-from . import benchmark as bm
+from . import benchmark as bm, sealed
 from .benchmark import Split
 from .features import feature_matrix, registrable_domain
 from .gap import sampling_confound_diagnostic
@@ -26,7 +26,7 @@ from .model import TrainedModel, train as train_rf
 
 SEED = 20260920
 ROOT = Path(__file__).resolve().parent.parent
-CORPUS = ROOT / "testing_new" / "retro" / "corpus.csv.gz"
+CORPUS = ROOT / "testing_new" / "retro" / "corpus.csv.gz.enc"
 OUT = ROOT / "testing_new" / "retro_results.json"
 N_RES = 1000
 
@@ -36,7 +36,7 @@ P2_FIXED = {"fit": ("2024-10-13", "2024-12-17"), "val": ("2024-12-18", "2024-12-
 
 
 def load_corpus(variant: str) -> pd.DataFrame:
-    f = pd.read_csv(CORPUS)
+    f = sealed.read_csv(CORPUS)
     f = f[(f.variant == "both") | (f.variant == variant)].copy()
     f["domain"] = [registrable_domain(u) for u in f.url]
     return f.reset_index(drop=True)
@@ -185,7 +185,7 @@ def final_model() -> tuple[TrainedModel, set]:
 
 def score_prospective() -> dict:
     """L1: F vs each benchmark model on branch-collected rows (testing_new/live/), F's domains excluded."""
-    frames = [pd.read_csv(p) for p in sorted((ROOT / "testing_new" / "live").glob("*.csv.gz"))]
+    frames = [sealed.read_csv(p) for p in sealed.data_files(ROOT / "testing_new" / "live")]
     if not frames:
         return {"ready": False, "reason": "no branch snapshots yet"}
     live = pd.concat(frames, ignore_index=True).drop_duplicates(subset=["url"])

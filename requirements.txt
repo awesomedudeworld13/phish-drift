@@ -11,3 +11,4 @@ tldextract>=5.1,<6
 # The shared evaluation harness. Every domain in this study must score with the
 # same code, which is the whole reason it is a package and not a copied file.
 benchgap>=0.1.0
+cryptography>=42

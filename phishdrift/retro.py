@@ -11,7 +11,7 @@ path-depth bucket x has_query, the audit-breach fix).
 
     python -m phishdrift.retro            # resumable; caches each month's benign pool
 
-Writes testing_new/retro/corpus.csv.gz (url, y, source, first_seen_utc,
+Writes testing_new/retro/corpus.csv.gz.enc, encrypted (url, y, source, first_seen_utc,
 snapshot_date, month, variant) and testing_new/retro/stats.json.
 """
 
@@ -209,8 +209,8 @@ def build() -> dict:
     frame = pd.DataFrame(rows)
     frame["snapshot_date"] = frame["first_seen_utc"].str[:10]
     frame["month"] = frame["snapshot_date"].str[:7]
-    with gzip.open(OUT / "corpus.csv.gz", "wt", encoding="utf-8", newline="") as fh:
-        frame.to_csv(fh, index=False)
+    from . import sealed
+    sealed.write_csv(frame, OUT / "corpus.csv.gz")       # encrypted: see DATA_HANDLING.md
     stats["rows"] = len(frame)
     (OUT / "stats.json").write_text(json.dumps(stats, indent=2), encoding="utf-8")
     return stats

@@ -74,7 +74,8 @@ def evaluate_variant() -> dict:
     from .retro_eval import CORPUS, P1, benchmarks, cell, date_split, load_corpus, p1
 
     rnd = pd.read_csv(CORPUS_RANDOM)
-    ph = pd.read_csv(CORPUS)
+    from . import sealed
+    ph = sealed.read_csv(CORPUS)
     f = pd.concat([ph[ph.variant == "both"], rnd], ignore_index=True)
     f["domain"] = [registrable_domain(u) for u in f.url]
     benches = benchmarks()

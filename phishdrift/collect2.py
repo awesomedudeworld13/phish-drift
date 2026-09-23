@@ -72,8 +72,9 @@ def last_cutoff() -> str:
 def run() -> Path | None:
     now = datetime.now(timezone.utc)
     day = now.strftime("%Y-%m-%d")
-    path = LIVE / f"{day}.csv.gz"
-    if path.exists():                                   # immutable, one file per UTC day
+    from . import sealed
+    path = LIVE / f"{day}.csv.gz{sealed.SUFFIX}"
+    if path.exists() or (LIVE / f"{day}.csv.gz").exists():   # immutable, one file per UTC day
         print(f"{path} exists; nothing to do")
         return None
     cutoff = last_cutoff()
@@ -96,8 +97,7 @@ def run() -> Path | None:
             + [{"url": u, "y": 0, "source": "commoncrawl", "first_seen_utc": stamp} for u in benign])
     frame = pd.DataFrame(rows).drop_duplicates(subset=["url"])
     LIVE.mkdir(parents=True, exist_ok=True)
-    with gzip.open(path, "wt", encoding="utf-8", newline="") as fh:
-        frame.to_csv(fh, index=False)
+    sealed.write_csv(frame, path)                       # encrypted: see DATA_HANDLING.md
     stats = {"date": day, "collected_utc": stamp, "phish_after": cutoff, "phish_through": through,
              "openphish_git": len(phish), "benign_realistic": len(benign), "rows": len(frame)}
     (LIVE / f"{day}.stats.json").write_text(json.dumps(stats, indent=2), encoding="utf-8")

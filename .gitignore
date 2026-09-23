@@ -13,3 +13,6 @@ __pycache__/
 audit.txt
 .pytest_cache/
 .DS_Store
+
+# Encryption key for feed files (DATA_HANDLING.md). Never commit it.
+.feed_key

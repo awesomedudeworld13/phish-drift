@@ -257,11 +257,12 @@ def write_snapshot(snapshot: Snapshot, live_dir: Path = Path("data/live")) -> Pa
     """
     live_dir = Path(live_dir)
     live_dir.mkdir(parents=True, exist_ok=True)
-    path = live_dir / f"{snapshot.date}.csv.gz"
-    if path.exists():
-        return path
-    with gzip.open(path, "wt", encoding="utf-8", newline="") as fh:
-        snapshot.frame.to_csv(fh, index=False)
+    from . import sealed
+    for existing in (live_dir / f"{snapshot.date}.csv.gz{sealed.SUFFIX}", live_dir / f"{snapshot.date}.csv.gz"):
+        if existing.exists():
+            return existing
+    # Encrypted: the feeds' terms forbid republishing their URLs (DATA_HANDLING.md).
+    path = sealed.write_csv(snapshot.frame, live_dir / f"{snapshot.date}.csv.gz")
     (live_dir / f"{snapshot.date}.stats.json").write_text(
         json.dumps(snapshot.stats, indent=2), encoding="utf-8"
     )
@@ -277,15 +278,16 @@ def load_live(live_dir: Path = Path("data/live"),
     a fixed-size window, so a URL reported on three consecutive days would
     otherwise be counted three times, over-weighting long-lived campaigns.
     """
+    from . import sealed
     live_dir = Path(live_dir)
-    files = sorted(live_dir.glob("*.csv.gz"))
+    files = sealed.data_files(live_dir)
     if not files:
         return pd.DataFrame(columns=["url", "y", "source", "first_seen_utc", "snapshot_date"])
 
     frames = []
     for f in files:
-        frame = pd.read_csv(f)
-        frame["snapshot_date"] = f.name.removesuffix(".csv.gz")
+        frame = sealed.read_csv(f)
+        frame["snapshot_date"] = sealed.stem(f)
         frames.append(frame)
 
     out = pd.concat(frames, ignore_index=True)
