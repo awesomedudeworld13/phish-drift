@@ -116,4 +116,15 @@ All results are reported, including failures, in `testing_new/RESULTS.md`.
 
 ## Deviations
 
-(none yet)
+**D1 (2026-09-22, before any corpus row was kept or scored): Common Crawl
+transport.** index.commoncrawl.org stopped answering during the first build
+(queries timed out after 21 s; the three pool workers had managed one
+40-domain batch each in ~9 min). Nothing from that attempt was saved. The
+benign sampling rule is unchanged (random Tranco top-50k domains, the first
+100 index records per domain, keep up to 25 status-200 HTML pages that aren't
+robots/sitemap). It now reads those same records from the crawl's static CDX
+shards on data.commoncrawl.org (binary search of `cluster.idx` plus HTTP range
+fetches: `phishdrift/cc_cdn.py`) instead of the index-server API. The crawl
+date windows are embedded from the collinfo listing retrieved earlier the same
+day. The branch's daily collector uses the same CDN path. Main's collector is
+unchanged.
