@@ -286,6 +286,34 @@ def test_timeline_counts_each_url_once_across_days():
     assert second["cumulative_domains"] == 4, second
 
 
+def test_sealed_snapshots_round_trip_and_hide_urls():
+    """Feed files are committed encrypted (DATA_HANDLING.md): the bytes on disk must
+    not contain the URLs, and load_live must still read them exactly."""
+    import os, tempfile
+    from cryptography.fernet import Fernet
+    from phishdrift import collect as live_collect, sealed
+
+    old = os.environ.get("FEED_KEY")
+    os.environ["FEED_KEY"] = Fernet.generate_key().decode()
+    try:
+        frame = pd.DataFrame({"url": ["http://evil.alpha.com/login", "https://www.benign-a.com/about"],
+                              "y": [1, 0], "source": ["openphish", "commoncrawl"],
+                              "first_seen_utc": ["2026-01-01T00:00:00+00:00"] * 2})
+        with tempfile.TemporaryDirectory() as tmp:
+            path = sealed.write_csv(frame, Path(tmp) / "2026-01-01.csv.gz")
+            assert path.name == "2026-01-01.csv.gz.enc", path.name
+            raw = path.read_bytes()
+            assert b"evil.alpha" not in raw and raw[:2] != bytes([0x1F, 0x8B])
+            back = live_collect.load_live(Path(tmp))
+            assert list(back.url) == list(frame.url), back.url.tolist()
+            assert set(back.snapshot_date) == {"2026-01-01"}
+    finally:
+        if old is None:
+            os.environ.pop("FEED_KEY")
+        else:
+            os.environ["FEED_KEY"] = old
+
+
 def _run_all():
     failures = 0
     for name, fn in sorted(globals().items()):

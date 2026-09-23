@@ -16,6 +16,10 @@ concurrency:
   group: testing-new-collect
   cancel-in-progress: false
 
+# Feed files are committed encrypted (DATA_HANDLING.md); this decrypts and writes them.
+env:
+  FEED_KEY: ${{ secrets.FEED_KEY }}
+
 jobs:
   snapshot:
     runs-on: ubuntu-latest
