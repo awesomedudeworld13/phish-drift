@@ -71,6 +71,13 @@ _HEADERS = {"User-Agent": USER_AGENT}
 # public service and we are a cron job; going faster buys nothing.
 CC_DELAY_SECONDS = 1.5
 
+# Wall-clock budget for the whole Common Crawl loop. requests' timeout only
+# bounds silence between bytes, so a slow index could otherwise run 40 x 90 s
+# and blow the job's 30-minute limit, losing the day's phishing rows with it
+# (2026-09-23). A day that hits the budget keeps fewer benign URLs, and the
+# snapshot stats say so.
+CC_BUDGET_SECONDS = 600
+
 
 @dataclass
 class Snapshot:
@@ -143,7 +150,9 @@ def latest_cc_collection() -> str:
 
 def fetch_commoncrawl_urls(domains: list[str], per_domain: int = 25,
                            collection: str | None = None,
-                           max_domains: int = 30) -> list[str]:
+                           max_domains: int = 30,
+                           budget_s: float = CC_BUDGET_SECONDS,
+                           stats: dict | None = None) -> list[str]:
     """Real benign URLs *with paths*, from the Common Crawl index.
 
     One index query per domain, so we query few domains and take several URLs
@@ -154,14 +163,19 @@ def fetch_commoncrawl_urls(domains: list[str], per_domain: int = 25,
     collection = collection or latest_cc_collection()
     endpoint = CC_INDEX.format(collection=collection)
     out: list[str] = []
+    deadline = time.monotonic() + budget_s
 
-    for domain in domains[:max_domains]:
+    for i, domain in enumerate(domains[:max_domains]):
+        if time.monotonic() > deadline:
+            if stats is not None:
+                stats["cc_budget_hit_after_domains"] = i
+            break
         try:
             r = requests.get(
                 endpoint,
                 params={"url": domain, "matchType": "domain",
                         "output": "json", "limit": per_domain * 4},
-                headers=_HEADERS, timeout=90,
+                headers=_HEADERS, timeout=(10, 60),
             )
             if r.status_code != 200:
                 continue
@@ -231,7 +245,7 @@ def build_snapshot(n_benign_realistic: int = 300,
     domains = fetch_tranco_domains(tranco_pool, cache=cache_dir / "tranco.json")
     rng.shuffle(domains)
 
-    realistic = fetch_commoncrawl_urls(domains, per_domain=25, max_domains=40)
+    realistic = fetch_commoncrawl_urls(domains, per_domain=25, max_domains=40, stats=stats)
     realistic = realistic[:n_benign_realistic]
     rows += [{"url": u, "y": 0, "source": "commoncrawl"} for u in realistic]
     stats["benign_realistic"] = len(realistic)
