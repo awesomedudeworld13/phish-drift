@@ -1,0 +1,8 @@
+{
+  "date": "2026-09-23",
+  "openphish": 300,
+  "urlhaus": 2000,
+  "benign_realistic": 75,
+  "benign_templated": 300,
+  "rows": 2673
+}
