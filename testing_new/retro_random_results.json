@@ -1,0 +1,205 @@
+{
+  "note": "EXPLORATORY, not pre-registered. Benign = random Common Crawl blocks, not Tranco top-50k.",
+  "P1_crawl_random_rf": {
+    "split_sizes": {
+      "fit": {
+        "n": 25653,
+        "phishing": 19500
+      },
+      "val": {
+        "n": 2550,
+        "phishing": 1559
+      },
+      "test": {
+        "n": 11006,
+        "phishing": 6532
+      }
+    },
+    "D_live_on_live": {
+      "tss": 0.8117,
+      "ci95": [
+        0.7927,
+        0.8285
+      ],
+      "n": 11006,
+      "positives": 6532
+    },
+    "benchmarks": {
+      "phiusiil": {
+        "A_bench_on_bench": {
+          "tss": 0.9954,
+          "ci95": [
+            0.9931,
+            0.9968
+          ],
+          "n": 35368,
+          "positives": 15246
+        },
+        "B_bench_on_live": {
+          "tss": 0.0,
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "n": 11006,
+          "positives": 6532
+        },
+        "C_live_on_bench": {
+          "tss": 0.6983,
+          "ci95": [
+            0.6109,
+            0.7537
+          ],
+          "n": 35368,
+          "positives": 15246
+        },
+        "gap_A_minus_B": 0.9954,
+        "recovery_D_minus_B": {
+          "value": 0.8117,
+          "ci95": [
+            0.7898,
+            0.8297
+          ],
+          "excludes_zero": true
+        }
+      },
+      "hannousse": {
+        "A_bench_on_bench": {
+          "tss": 0.7187,
+          "ci95": [
+            0.5703,
+            0.8297
+          ],
+          "n": 1714,
+          "positives": 982
+        },
+        "B_bench_on_live": {
+          "tss": 0.4167,
+          "ci95": [
+            0.3915,
+            0.4385
+          ],
+          "n": 11006,
+          "positives": 6532
+        },
+        "C_live_on_bench": {
+          "tss": 0.4447,
+          "ci95": [
+            0.2864,
+            0.5581
+          ],
+          "n": 1714,
+          "positives": 982
+        },
+        "gap_A_minus_B": 0.302,
+        "recovery_D_minus_B": {
+          "value": 0.395,
+          "ci95": [
+            0.3664,
+            0.4264
+          ],
+          "excludes_zero": true
+        }
+      },
+      "kaitholikkal": {
+        "A_bench_on_bench": {
+          "tss": 0.9942,
+          "ci95": [
+            0.9928,
+            0.9955
+          ],
+          "n": 66498,
+          "positives": 12258
+        },
+        "B_bench_on_live": {
+          "tss": 0.2553,
+          "ci95": [
+            0.2291,
+            0.2784
+          ],
+          "n": 11006,
+          "positives": 6532
+        },
+        "C_live_on_bench": {
+          "tss": 0.4129,
+          "ci95": [
+            0.204,
+            0.6333
+          ],
+          "n": 66498,
+          "positives": 12258
+        },
+        "gap_A_minus_B": 0.7389,
+        "recovery_D_minus_B": {
+          "value": 0.5564,
+          "ci95": [
+            0.5253,
+            0.5903
+          ],
+          "excludes_zero": true
+        }
+      },
+      "faizann": {
+        "A_bench_on_bench": {
+          "tss": 0.8017,
+          "ci95": [
+            0.7803,
+            0.8193
+          ],
+          "n": 62994,
+          "positives": 11299
+        },
+        "B_bench_on_live": {
+          "tss": 0.2319,
+          "ci95": [
+            0.2102,
+            0.2553
+          ],
+          "n": 11006,
+          "positives": 6532
+        },
+        "C_live_on_bench": {
+          "tss": 0.239,
+          "ci95": [
+            0.1541,
+            0.3309
+          ],
+          "n": 62994,
+          "positives": 11299
+        },
+        "gap_A_minus_B": 0.5698,
+        "recovery_D_minus_B": {
+          "value": 0.5798,
+          "ci95": [
+            0.5489,
+            0.6081
+          ],
+          "excludes_zero": true
+        }
+      }
+    }
+  },
+  "tranco_trained_on_crawl_random_test": {
+    "tss": 0.6748,
+    "ci95": [
+      0.6529,
+      0.6947
+    ],
+    "n": 10991,
+    "positives": 6527
+  },
+  "audits_peak_tss": {
+    "realistic": {
+      "path_shape": 0.584476,
+      "domain_only": 0.657145
+    },
+    "path_matched": {
+      "path_shape": 0.274281,
+      "domain_only": 0.601078
+    },
+    "crawl_random": {
+      "path_shape": 0.648813,
+      "domain_only": 0.631746
+    }
+  }
+}

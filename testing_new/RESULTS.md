@@ -80,3 +80,44 @@ sit in P1's training period and don't touch any test window.
 **Prospective check (L1):** `python -m phishdrift.retro_eval --prospective`
 scores final model F against the four benchmark models on the branch's
 daily-collected data. Check on 2026-10-23 and 2026-11-22.
+
+## Exploratory (not pre-registered): benign URLs from random crawl blocks
+
+Added 2026-09-23 after a review pointed out that both pre-registered benign
+samples come from the Tranco top-50,000, so every benign URL is a popular site.
+Kaitholikkal was flagged on this project's main page for the same kind of
+construction (Majestic Million benign against PhishTank phishing), so the P1
+recovery could have been "popular site or not" rather than phishing.
+
+`python -m phishdrift.retro_random` draws 500 benign URLs a month from
+uniformly random CDX blocks of that month's crawl (one URL per registrable
+domain per block), keeps the same phishing rows, and reruns P1 unchanged.
+Raw numbers: `retro_random_results.json`.
+
+| Benign sample | D (live-trained, live test) | Domain-only audit | Path-shape audit |
+|---|---|---|---|
+| Tranco top-50k, realistic (registered) | 0.731 | 0.657 | 0.584 |
+| Tranco top-50k, path-matched (registered) | 0.654 | 0.601 | 0.274 |
+| **Random crawl blocks** | **0.812 (0.793–0.829)** | 0.632 | 0.649 |
+
+Recovery D − B on random-crawl benign: PhiUSIIL +0.812, Hannousse +0.395,
+Kaitholikkal +0.556, faizann +0.580. Every CI excludes zero.
+
+**What this shows.**
+
+1. **The popularity explanation doesn't hold.** The prediction was that D would
+   fall once benign stopped being popular sites. It rose. A live model trained
+   the registered way (Tranco benign) scores 0.675 (0.653–0.695) on random-crawl
+   benign it never saw, against 0.731 on its own kind of benign: changing the
+   benign source costs about 0.06, not the result.
+2. **The collection audit can't separate artifact from signal here.** OpenPhish
+   URLs are separable from every benign source at 0.60–0.66 using domain
+   features alone. That's expected if phishing domains really do look
+   different (fresh registrations, abused TLDs, random tokens), and it's also
+   what a collection artifact would look like. A surface-feature audit can't
+   tell those apart, so H12's "path-matched passes at 0.274" checked one axis
+   of a test that can't settle the question it was built for. It shouldn't be
+   cited as clearing the collection confound.
+3. **Still open:** the positives are what OpenPhish's own pipeline caught. A
+   model trained on them learns to reproduce OpenPhish, and phishing OpenPhish
+   misses is never measured.
