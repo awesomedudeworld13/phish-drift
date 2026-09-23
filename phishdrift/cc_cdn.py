@@ -95,8 +95,7 @@ def _cluster(collection: str) -> tuple[list[str], list[str]]:
             time.sleep(60 * (attempt + 1))
         else:
             raise Blocked(f"cluster.idx download refused for {collection}")
-    lines = [ln for ln in path.read_text(encoding="utf-8", errors="replace").split("
-") if "	" in ln]
+    lines = [ln for ln in path.read_text(encoding="utf-8", errors="replace").splitlines() if "	" in ln]
     _CLUSTER.clear()                                      # one crawl resident at a time
     _CLUSTER[collection] = ([ln.split(" ", 1)[0] for ln in lines], lines)
     return _CLUSTER[collection]
