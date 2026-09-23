@@ -23,6 +23,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
 KEY_FILE = ROOT / ".feed_key"
+MANIFEST = ROOT / "SEALED_SHA256.txt"
 SUFFIX = ".enc"
 
 
@@ -60,7 +61,20 @@ def write_csv(frame: pd.DataFrame, path: Path) -> Path:
     with gzip.GzipFile(fileobj=buf, mode="wb", mtime=0) as fh:
         fh.write(frame.to_csv(index=False).encode("utf-8"))
     path.write_bytes(seal(buf.getvalue()))
+    _record(path, gzip.decompress(buf.getvalue()))
     return path
+
+
+def _record(path: Path, csv: bytes) -> None:
+    """Append the file's decrypted-CSV hash to SEALED_SHA256.txt (repo files only)."""
+    import hashlib
+    try:
+        rel = path.resolve().relative_to(ROOT).as_posix()
+    except ValueError:                                   # outside the repo, e.g. a test's temp dir
+        return
+    if MANIFEST.exists():
+        with open(MANIFEST, "a", encoding="utf-8", newline="\n") as fh:
+            fh.write(f"{hashlib.sha256(csv).hexdigest()}  {rel}\n")
 
 
 def stem(path: Path) -> str:
