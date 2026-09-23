@@ -1,0 +1,61 @@
+# Runs the testing-new branch's collector once a day and commits its snapshot
+# back to THAT branch. It lives on main only because GitHub fires `schedule`
+# triggers from the default branch; it reads and writes nothing on main.
+# See testing_new/PREREGISTRATION.md on the testing-new branch.
+name: testing-new-collect
+
+on:
+  schedule:
+    - cron: "40 7 * * *"       # daily, after main's collect (06:20)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: testing-new-collect
+  cancel-in-progress: false
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: testing-new
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: pip install --quiet -r requirements.txt
+
+      - name: Restore caches (Tranco list, OpenPhish history)
+        uses: actions/cache@v4
+        with:
+          path: data/cache
+          key: testing-new-cache-${{ github.run_id }}
+          restore-keys: testing-new-cache-
+
+      - name: Collect
+        run: python -m phishdrift.collect2
+
+      - name: Commit
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add testing_new/live
+          if git diff --cached --quiet; then
+            echo "No new snapshot today."
+            exit 0
+          fi
+          git commit -m "testing-new: live snapshot $(date -u +%F)"
+          for attempt in 1 2 3; do
+            git pull --rebase origin testing-new && git push origin HEAD:testing-new && exit 0
+            echo "push attempt $attempt failed; retrying"
+            sleep 5
+          done
+          exit 1
