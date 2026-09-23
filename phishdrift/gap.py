@@ -128,7 +128,8 @@ def evaluate_cell(name: str, description: str, model, frame: pd.DataFrame,
     return cell
 
 
-def sampling_confound_diagnostic(live: pd.DataFrame, seed: int = 20260920) -> dict:
+def sampling_confound_diagnostic(live: pd.DataFrame, seed: int = 20260920,
+                                  features: tuple[str, ...] = PATH_SHAPE_FEATURES) -> dict:
     """Can path *shape* alone separate our live classes?
 
     This is the audit of our own data collection, and it is deliberately aimed
@@ -146,7 +147,7 @@ def sampling_confound_diagnostic(live: pd.DataFrame, seed: int = 20260920) -> di
     from sklearn.ensemble import RandomForestClassifier
     from sklearn.model_selection import GroupKFold
 
-    idx = [FEATURE_NAMES.index(f) for f in PATH_SHAPE_FEATURES]
+    idx = [FEATURE_NAMES.index(f) for f in features]
     X = feature_matrix(live["url"])[:, idx]
     y = live["y"].to_numpy()
     groups = live["domain"].to_numpy()
@@ -181,7 +182,7 @@ def sampling_confound_diagnostic(live: pd.DataFrame, seed: int = 20260920) -> di
     breached = peak > CONFOUND_CEILING
     return {
         "available": True,
-        "features_used": list(PATH_SHAPE_FEATURES),
+        "features_used": list(features),
         "n": int(len(y)),
         "peak_tss_path_shape_only": round(peak, 6),
         "threshold": round(thr, 6),

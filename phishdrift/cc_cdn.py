@@ -152,3 +152,44 @@ if __name__ == "__main__":
     urls = fetch_commoncrawl_urls(["wikipedia.org", "example.com"], collection="CC-MAIN-2025-05", max_domains=2)
     assert urls and all("wikipedia.org" in u or "example.com" in u for u in urls), urls[:5]
     print(len(urls), urls[:3])
+
+
+def random_urls(collection: str, n: int, rng, per_block: int = 5, max_blocks: int = 400) -> list[str]:
+    """`n` HTML URLs from uniformly random CDX blocks of the crawl, not from a domain list.
+
+    The Tranco-seeded pools only ever contain popular sites, which a model can
+    tell from phishing by the domain alone. Random blocks sample the crawl as it
+    is, long tail included. A block is ~3,000 consecutive SURT-sorted records, so
+    at most one URL per registrable domain is kept per block, and `per_block`
+    URLs per block, to stop one large site filling the sample.
+    """
+    from .features import registrable_domain
+    keys, lines = _cluster(collection)
+    out: list[str] = []
+    seen: set[str] = set()
+    for i in rng.sample(range(len(lines)), min(max_blocks, len(lines))):
+        _key, shard, off, length = lines[i].split("\t")[:4]
+        raw = _get(BASE.format(c=collection) + shard, int(off), int(off) + int(length) - 1)
+        recs = zlib.decompress(raw, 16 + zlib.MAX_WBITS).decode("utf-8", "replace").splitlines()
+        rng.shuffle(recs)
+        kept = 0
+        for line in recs:
+            try:
+                rec = json.loads(line.split(" ", 2)[2])
+            except (IndexError, json.JSONDecodeError):
+                continue
+            url = rec.get("url", "")
+            if not (rec.get("status") == "200" and "html" in (rec.get("mime") or "")
+                    and not url.rstrip("/").endswith(("robots.txt", "sitemap.xml"))):
+                continue
+            dom = registrable_domain(url)
+            if dom in seen:
+                continue
+            seen.add(dom)
+            out.append(url)
+            kept += 1
+            if kept >= per_block or len(out) >= n:
+                break
+        if len(out) >= n:
+            break
+    return out

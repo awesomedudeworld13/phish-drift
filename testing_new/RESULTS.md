@@ -50,8 +50,8 @@ pre-registered; HGB is reported alongside.
 |---|---|---|---|
 | **H7 (primary)** | D−B > 0, CI excl. 0, all 4; D 0.60–0.90; D−B ≥ 0.30 | all 4 excl. 0; D 0.731; smallest D−B +0.328 | **Held** |
 | H8 | C < A for all 4; C < A−0.10 for ≥3 | all 4, all by > 0.13 | **Held** |
-| H9 (D2) | slope < 0, CI excl. 0; −0.005 to −0.03/month | −0.0042 (CI excl. 0) | **Held on direction**, magnitude just under the predicted band |
-| H10 (D2) | refreshed > fixed, CI excl. 0; +0.02 to +0.10 | +0.045 (0.034–0.058) | **Held** |
+| H9 (D2) | slope < 0, CI excl. 0; −0.005 to −0.03/month | −0.0042 (CI excl. 0) | **Missed**: direction right, magnitude outside the predicted band. Post hoc (D2), so exploratory either way |
+| H10 (D2) | refreshed > fixed, CI excl. 0; +0.02 to +0.10 | +0.045 (0.034–0.058) | Consistent with the prediction, but **not a confirmed test**: the design was repaired after the first scoring run (D2) |
 | H11 | \|D_HGB − D_RF\| < 0.05 | 0.030 | **Held** |
 | H12 | path-matched audit < 0.30 | 0.274 | **Held** |
 | H13 | recovery survives path matching, all 4; D falls 0.05–0.25 | all 4 excl. 0; D fell 0.077 | **Held** |
