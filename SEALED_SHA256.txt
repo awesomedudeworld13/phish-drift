@@ -1,0 +1,8 @@
+# SHA-256 of each encrypted file's decrypted CSV (see DATA_HANDLING.md).
+# Check: decrypt with the key, gunzip, sha256 the bytes.
+
+7775b2ac2f43597a9276831b30aa6e5cdb84761372cd21a58251831986a146b8  data/live/2026-09-20.csv.gz.enc
+5d0cdb0800a5fc3874a0fa98c45b798fb82142aebe8036c7676c5a0ec6224ec0  data/live/2026-09-21.csv.gz.enc
+e272d77e6bafd7d171ee17e645f64c8149b1e221dfc6da5a2bb66299ba3e2c29  data/live/2026-09-22.csv.gz.enc
+dd08a039020f1c507b6840df8d092d46b29803c3b528125159a72c05782bc73b  testing_new/live/2026-09-23.csv.gz.enc
+bbbc3cda776cf9167931fce9879e73c5327fcff3636682619dff7cc8cb8e24d6  testing_new/retro/corpus.csv.gz.enc
