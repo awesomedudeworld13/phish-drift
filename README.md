@@ -150,7 +150,7 @@ Every model above was trained on a static dataset, so none of them can tell you 
 
 This builds itself once enough days accumulate. It needs 10 days to train on and 4 to test on, split by date. Training on Monday and testing on Wednesday would let the model memorize a campaign that ran all week, which is the exact mistake this project is about. As of the latest run, 1 day is collected and 13 remain. Our predictions are written down in [PREREGISTRATION.md](PREREGISTRATION.md) before any live-trained model exists, which is the only thing that makes them count.
 
-The companion ozone and solar projects have already answered this question, and both found that retraining on newer data does not close the gap.
+The companion projects don't settle it either. Solar found that retraining didn't close the gap in solar cycle 24. Ozone first reported that retraining made things worse, but that turned out to be the warning cutoff, not the model: with the cutoff taken out, the two models scored the same. An exploratory run on the `testing-new` branch, using dated historical feed data, suggests that for phishing the answer is yes; it is not pre-registered here and is reported there.
 
 ---
 
