@@ -215,7 +215,7 @@ python tests/test_features.py                          # checks the method itsel
 
 ### The daily collection
 
-A scheduled job adds one permanent snapshot per day to `data/live/`: about 300 phishing URLs from OpenPhish, 300 real safe URLs with real page paths from Common Crawl, and the same sites rewritten into PhiUSIIL's template format for comparison. Snapshots are committed before they are ever scored, so the record cannot be quietly adjusted afterward.
+A scheduled job adds one permanent snapshot per day to `data/live/`: about 300 phishing URLs from OpenPhish, 300 real safe URLs with real page paths from Common Crawl, and the same sites rewritten into PhiUSIIL's template format for comparison. Snapshots are committed before they are ever scored, so the record cannot be quietly adjusted afterward. They are committed **encrypted**, because OpenPhish's terms forbid republishing its URLs; [DATA_HANDLING.md](DATA_HANDLING.md) explains what was done and why.
 
 ### Where the data comes from
 
