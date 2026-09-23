@@ -128,3 +128,19 @@ fetches: `phishdrift/cc_cdn.py`) instead of the index-server API. The crawl
 date windows are embedded from the collinfo listing retrieved earlier the same
 day. The branch's daily collector uses the same CDN path. Main's collector is
 unchanged.
+
+**D2 (2026-09-23 03:2x UTC, after the first scoring run): P2 validation windows.**
+As pre-registered, P2 validated on the last 14 days of a month (fixed model:
+2024-12-18 to 12-31). Benign URLs are dated inside each month's crawl window,
+which usually ends mid-month (e.g. CC-MAIN-2024-51: 12-01 to 12-15), so those
+windows held **zero benign rows**. The fixed model's validation had 622
+phishing rows and 0 benign. With one class no threshold is defined; every
+URL was called phishing and TSS was exactly 0 in every month (the
+refreshed model was 0 in any month whose previous crawl ended before the
+18th). H9/H10 are therefore **not evaluable as pre-registered**; that run is
+kept in `retro_results.json` as `P2_decay_realistic_rf`. Corrected
+(`P2_decay_corrected_D2`): the fixed model trains 2024-10-13 to 11-30 and
+validates on all of December 2024; the refreshed model for month m trains on
+m−3 to m−2 and validates on all of m−1. The failed run's zeros carried no
+information about the real answer, so this is a repair, not a selection. It
+is still labelled post hoc.

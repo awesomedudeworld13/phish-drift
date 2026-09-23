@@ -1,0 +1,225 @@
+{
+  "span": [
+    "2024-10-13",
+    "2026-09-19"
+  ],
+  "months": {
+    "2024-10": {
+      "phishing": 1500,
+      "phishing_available": 16891,
+      "crawl": "CC-MAIN-2024-42",
+      "benign_pool": 2665,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 566
+    },
+    "2024-11": {
+      "phishing": 1500,
+      "phishing_available": 23857,
+      "crawl": "CC-MAIN-2024-46",
+      "benign_pool": 2709,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 671
+    },
+    "2024-12": {
+      "phishing": 1500,
+      "phishing_available": 23694,
+      "crawl": "CC-MAIN-2024-51",
+      "benign_pool": 2452,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 680
+    },
+    "2025-01": {
+      "phishing": 1500,
+      "phishing_available": 23364,
+      "crawl": "CC-MAIN-2025-05",
+      "benign_pool": 2645,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 646
+    },
+    "2025-02": {
+      "phishing": 1500,
+      "phishing_available": 21455,
+      "crawl": "CC-MAIN-2025-08",
+      "benign_pool": 2382,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 735
+    },
+    "2025-03": {
+      "phishing": 1500,
+      "phishing_available": 22254,
+      "crawl": "CC-MAIN-2025-13",
+      "benign_pool": 2576,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 597
+    },
+    "2025-04": {
+      "phishing": 1500,
+      "phishing_available": 14876,
+      "crawl": "CC-MAIN-2025-18",
+      "benign_pool": 2525,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 812
+    },
+    "2025-05": {
+      "phishing": 1500,
+      "phishing_available": 16021,
+      "crawl": "CC-MAIN-2025-21",
+      "benign_pool": 2741,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 545
+    },
+    "2025-06": {
+      "phishing": 1500,
+      "phishing_available": 11971,
+      "crawl": "CC-MAIN-2025-26",
+      "benign_pool": 2355,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 551
+    },
+    "2025-07": {
+      "phishing": 1500,
+      "phishing_available": 13111,
+      "crawl": "CC-MAIN-2025-30",
+      "benign_pool": 2518,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 506
+    },
+    "2025-08": {
+      "phishing": 1500,
+      "phishing_available": 13080,
+      "crawl": "CC-MAIN-2025-33",
+      "benign_pool": 2374,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 617
+    },
+    "2025-09": {
+      "phishing": 1500,
+      "phishing_available": 14009,
+      "crawl": "CC-MAIN-2025-38",
+      "benign_pool": 2701,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 634
+    },
+    "2025-10": {
+      "phishing": 1500,
+      "phishing_available": 14394,
+      "crawl": "CC-MAIN-2025-43",
+      "benign_pool": 2571,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 590
+    },
+    "2025-11": {
+      "phishing": 1500,
+      "phishing_available": 15009,
+      "crawl": "CC-MAIN-2025-47",
+      "benign_pool": 2360,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 419
+    },
+    "2025-12": {
+      "phishing": 1500,
+      "phishing_available": 14810,
+      "crawl": "CC-MAIN-2025-51",
+      "benign_pool": 2589,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 279
+    },
+    "2026-01": {
+      "phishing": 1500,
+      "phishing_available": 13156,
+      "crawl": "CC-MAIN-2026-04",
+      "benign_pool": 2717,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 525
+    },
+    "2026-02": {
+      "phishing": 1500,
+      "phishing_available": 12608,
+      "crawl": "CC-MAIN-2026-08",
+      "benign_pool": 2756,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 489
+    },
+    "2026-03": {
+      "phishing": 1500,
+      "phishing_available": 11790,
+      "crawl": "CC-MAIN-2026-12",
+      "benign_pool": 2377,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 518
+    },
+    "2026-04": {
+      "phishing": 1500,
+      "phishing_available": 11909,
+      "crawl": "CC-MAIN-2026-17",
+      "benign_pool": 2523,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 541
+    },
+    "2026-05": {
+      "phishing": 1500,
+      "phishing_available": 14836,
+      "crawl": "CC-MAIN-2026-21",
+      "benign_pool": 2643,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 613
+    },
+    "2026-06": {
+      "phishing": 1500,
+      "phishing_available": 13595,
+      "crawl": "CC-MAIN-2026-25",
+      "benign_pool": 2513,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 579
+    },
+    "2026-07": {
+      "phishing": 1500,
+      "phishing_available": 15356,
+      "crawl": "CC-MAIN-2026-30",
+      "benign_pool": 2227,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 682
+    },
+    "2026-08": {
+      "phishing": 1500,
+      "phishing_available": 15396,
+      "crawl": "CC-MAIN-2026-34",
+      "benign_pool": 2321,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 692
+    },
+    "2026-09": {
+      "phishing": 1500,
+      "phishing_available": 8269,
+      "crawl": "CC-MAIN-2026-39",
+      "benign_pool": 2449,
+      "realistic": 1500,
+      "path_matched": 1500,
+      "path_matched_resampled": 670
+    }
+  },
+  "rows": 108000
+}

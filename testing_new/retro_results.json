@@ -1,0 +1,709 @@
+{
+  "preregistration": "testing_new/PREREGISTRATION.md",
+  "P1_realistic_rf": {
+    "split_sizes": {
+      "fit": {
+        "n": 37947,
+        "phishing": 19500
+      },
+      "val": {
+        "n": 4373,
+        "phishing": 1559
+      },
+      "test": {
+        "n": 19215,
+        "phishing": 6555
+      }
+    },
+    "D_live_on_live": {
+      "tss": 0.7313,
+      "ci95": [
+        0.7043,
+        0.7552
+      ],
+      "n": 19215,
+      "positives": 6555
+    },
+    "benchmarks": {
+      "phiusiil": {
+        "A_bench_on_bench": {
+          "tss": 0.9954,
+          "ci95": [
+            0.9931,
+            0.9968
+          ],
+          "n": 35368,
+          "positives": 15246
+        },
+        "B_bench_on_live": {
+          "tss": 0.0006,
+          "ci95": [
+            0.0001,
+            0.0015
+          ],
+          "n": 19215,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.86,
+          "ci95": [
+            0.8061,
+            0.8937
+          ],
+          "n": 35368,
+          "positives": 15246
+        },
+        "gap_A_minus_B": 0.9948,
+        "recovery_D_minus_B": {
+          "value": 0.7307,
+          "ci95": [
+            0.7036,
+            0.7544
+          ],
+          "excludes_zero": true
+        }
+      },
+      "hannousse": {
+        "A_bench_on_bench": {
+          "tss": 0.7187,
+          "ci95": [
+            0.5703,
+            0.8297
+          ],
+          "n": 1714,
+          "positives": 982
+        },
+        "B_bench_on_live": {
+          "tss": 0.4034,
+          "ci95": [
+            0.3718,
+            0.4335
+          ],
+          "n": 19215,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.4096,
+          "ci95": [
+            0.2888,
+            0.5116
+          ],
+          "n": 1714,
+          "positives": 982
+        },
+        "gap_A_minus_B": 0.3153,
+        "recovery_D_minus_B": {
+          "value": 0.328,
+          "ci95": [
+            0.2861,
+            0.3689
+          ],
+          "excludes_zero": true
+        }
+      },
+      "kaitholikkal": {
+        "A_bench_on_bench": {
+          "tss": 0.9942,
+          "ci95": [
+            0.9928,
+            0.9955
+          ],
+          "n": 66498,
+          "positives": 12258
+        },
+        "B_bench_on_live": {
+          "tss": 0.3876,
+          "ci95": [
+            0.3458,
+            0.4241
+          ],
+          "n": 19215,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.7917,
+          "ci95": [
+            0.6989,
+            0.8427
+          ],
+          "n": 66498,
+          "positives": 12258
+        },
+        "gap_A_minus_B": 0.6066,
+        "recovery_D_minus_B": {
+          "value": 0.3437,
+          "ci95": [
+            0.2939,
+            0.3912
+          ],
+          "excludes_zero": true
+        }
+      },
+      "faizann": {
+        "A_bench_on_bench": {
+          "tss": 0.8017,
+          "ci95": [
+            0.7803,
+            0.8193
+          ],
+          "n": 62994,
+          "positives": 11299
+        },
+        "B_bench_on_live": {
+          "tss": 0.1479,
+          "ci95": [
+            0.1174,
+            0.1792
+          ],
+          "n": 19215,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.0624,
+          "ci95": [
+            0.0357,
+            0.1006
+          ],
+          "n": 62994,
+          "positives": 11299
+        },
+        "gap_A_minus_B": 0.6538,
+        "recovery_D_minus_B": {
+          "value": 0.5834,
+          "ci95": [
+            0.5429,
+            0.6231
+          ],
+          "excludes_zero": true
+        }
+      }
+    }
+  },
+  "P3_hgb": {
+    "D_live_on_live_hgb": {
+      "tss": 0.7613,
+      "ci95": [
+        0.7369,
+        0.7831
+      ],
+      "n": 19215,
+      "positives": 6555
+    },
+    "D_rf_minus_hgb": -0.03
+  },
+  "P4_path_matched_rf": {
+    "split_sizes": {
+      "fit": {
+        "n": 37936,
+        "phishing": 19500
+      },
+      "val": {
+        "n": 4339,
+        "phishing": 1559
+      },
+      "test": {
+        "n": 19095,
+        "phishing": 6555
+      }
+    },
+    "D_live_on_live": {
+      "tss": 0.6543,
+      "ci95": [
+        0.6242,
+        0.6826
+      ],
+      "n": 19095,
+      "positives": 6555
+    },
+    "benchmarks": {
+      "phiusiil": {
+        "A_bench_on_bench": {
+          "tss": 0.9954,
+          "ci95": [
+            0.9931,
+            0.9968
+          ],
+          "n": 35368,
+          "positives": 15246
+        },
+        "B_bench_on_live": {
+          "tss": 0.003,
+          "ci95": [
+            0.0011,
+            0.005
+          ],
+          "n": 19095,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.7554,
+          "ci95": [
+            0.6597,
+            0.8287
+          ],
+          "n": 35368,
+          "positives": 15246
+        },
+        "gap_A_minus_B": 0.9924,
+        "recovery_D_minus_B": {
+          "value": 0.6513,
+          "ci95": [
+            0.6221,
+            0.6796
+          ],
+          "excludes_zero": true
+        }
+      },
+      "hannousse": {
+        "A_bench_on_bench": {
+          "tss": 0.7187,
+          "ci95": [
+            0.5703,
+            0.8297
+          ],
+          "n": 1714,
+          "positives": 982
+        },
+        "B_bench_on_live": {
+          "tss": 0.3939,
+          "ci95": [
+            0.3592,
+            0.4276
+          ],
+          "n": 19095,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.4497,
+          "ci95": [
+            0.3253,
+            0.5369
+          ],
+          "n": 1714,
+          "positives": 982
+        },
+        "gap_A_minus_B": 0.3248,
+        "recovery_D_minus_B": {
+          "value": 0.2604,
+          "ci95": [
+            0.2179,
+            0.3041
+          ],
+          "excludes_zero": true
+        }
+      },
+      "kaitholikkal": {
+        "A_bench_on_bench": {
+          "tss": 0.9942,
+          "ci95": [
+            0.9928,
+            0.9955
+          ],
+          "n": 66498,
+          "positives": 12258
+        },
+        "B_bench_on_live": {
+          "tss": 0.3433,
+          "ci95": [
+            0.3022,
+            0.3804
+          ],
+          "n": 19095,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.8143,
+          "ci95": [
+            0.6953,
+            0.8846
+          ],
+          "n": 66498,
+          "positives": 12258
+        },
+        "gap_A_minus_B": 0.6509,
+        "recovery_D_minus_B": {
+          "value": 0.311,
+          "ci95": [
+            0.2605,
+            0.3585
+          ],
+          "excludes_zero": true
+        }
+      },
+      "faizann": {
+        "A_bench_on_bench": {
+          "tss": 0.8017,
+          "ci95": [
+            0.7803,
+            0.8193
+          ],
+          "n": 62994,
+          "positives": 11299
+        },
+        "B_bench_on_live": {
+          "tss": 0.1692,
+          "ci95": [
+            0.1357,
+            0.2037
+          ],
+          "n": 19095,
+          "positives": 6555
+        },
+        "C_live_on_bench": {
+          "tss": 0.05,
+          "ci95": [
+            0.0112,
+            0.0846
+          ],
+          "n": 62994,
+          "positives": 11299
+        },
+        "gap_A_minus_B": 0.6325,
+        "recovery_D_minus_B": {
+          "value": 0.4851,
+          "ci95": [
+            0.4408,
+            0.5317
+          ],
+          "excludes_zero": true
+        }
+      }
+    }
+  },
+  "P4_audit_path_matched": {
+    "available": true,
+    "features_used": [
+      "path_length",
+      "query_length",
+      "fragment_length",
+      "path_depth",
+      "n_query_params",
+      "n_slashes",
+      "n_equals",
+      "n_ampersands"
+    ],
+    "n": 19095,
+    "peak_tss_path_shape_only": 0.274281,
+    "threshold": 0.53748,
+    "preregistered_ceiling": 0.3,
+    "ceiling_breached": false,
+    "path_presence_rate": {
+      "benign": 0.55327,
+      "phishing": 0.608543
+    },
+    "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
+    "verdict": "OK: 0.274 is within the pre-registered ceiling of 0.3."
+  },
+  "P4_audit_realistic_same_months": {
+    "available": true,
+    "features_used": [
+      "path_length",
+      "query_length",
+      "fragment_length",
+      "path_depth",
+      "n_query_params",
+      "n_slashes",
+      "n_equals",
+      "n_ampersands"
+    ],
+    "n": 19215,
+    "peak_tss_path_shape_only": 0.584476,
+    "threshold": 0.522237,
+    "preregistered_ceiling": 0.3,
+    "ceiling_breached": true,
+    "path_presence_rate": {
+      "benign": 0.853476,
+      "phishing": 0.608543
+    },
+    "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
+    "verdict": "BREACHED: 0.584 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 85.3% of BENIGN URLs carry a path against 60.9% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.584 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
+  },
+  "P2_decay_realistic_rf": {
+    "months": [
+      {
+        "month": "2025-01",
+        "n": 2173,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.0
+      },
+      {
+        "month": "2025-02",
+        "n": 2046,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.7713
+      },
+      {
+        "month": "2025-03",
+        "n": 2034,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.7479
+      },
+      {
+        "month": "2025-04",
+        "n": 1851,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.7423
+      },
+      {
+        "month": "2025-05",
+        "n": 1982,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.6922
+      },
+      {
+        "month": "2025-06",
+        "n": 2161,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.6817
+      },
+      {
+        "month": "2025-07",
+        "n": 2194,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.6174
+      },
+      {
+        "month": "2025-08",
+        "n": 2106,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.0711
+      },
+      {
+        "month": "2025-09",
+        "n": 2126,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.0
+      },
+      {
+        "month": "2025-10",
+        "n": 2189,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.5508
+      },
+      {
+        "month": "2025-11",
+        "n": 2102,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.7746
+      },
+      {
+        "month": "2025-12",
+        "n": 2413,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.6036
+      },
+      {
+        "month": "2026-01",
+        "n": 2323,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.0
+      },
+      {
+        "month": "2026-02",
+        "n": 2060,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.5663
+      },
+      {
+        "month": "2026-03",
+        "n": 2046,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.6157
+      },
+      {
+        "month": "2026-04",
+        "n": 2121,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.0
+      },
+      {
+        "month": "2026-05",
+        "n": 2339,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.7814
+      },
+      {
+        "month": "2026-06",
+        "n": 2241,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.7358
+      },
+      {
+        "month": "2026-07",
+        "n": 2014,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.688
+      },
+      {
+        "month": "2026-08",
+        "n": 1974,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.3948
+      },
+      {
+        "month": "2026-09",
+        "n": 1892,
+        "fixed_tss": 0.0,
+        "refreshed_tss": 0.2883
+      }
+    ],
+    "H9_fixed_slope_per_month": {
+      "value": 0.0,
+      "ci95": [
+        0.0,
+        0.0
+      ]
+    },
+    "H10_refresh_advantage": {
+      "value": 0.4916,
+      "ci95": [
+        0.4767,
+        0.5058
+      ]
+    }
+  },
+  "P2_decay_corrected_D2": {
+    "months": [
+      {
+        "month": "2025-01",
+        "n": 2173,
+        "fixed_tss": 0.7888,
+        "refreshed_tss": 0.7753
+      },
+      {
+        "month": "2025-02",
+        "n": 2046,
+        "fixed_tss": 0.7424,
+        "refreshed_tss": 0.7523
+      },
+      {
+        "month": "2025-03",
+        "n": 2034,
+        "fixed_tss": 0.7526,
+        "refreshed_tss": 0.7602
+      },
+      {
+        "month": "2025-04",
+        "n": 1851,
+        "fixed_tss": 0.7449,
+        "refreshed_tss": 0.736
+      },
+      {
+        "month": "2025-05",
+        "n": 1982,
+        "fixed_tss": 0.6616,
+        "refreshed_tss": 0.6734
+      },
+      {
+        "month": "2025-06",
+        "n": 2161,
+        "fixed_tss": 0.6585,
+        "refreshed_tss": 0.7045
+      },
+      {
+        "month": "2025-07",
+        "n": 2194,
+        "fixed_tss": 0.6337,
+        "refreshed_tss": 0.7331
+      },
+      {
+        "month": "2025-08",
+        "n": 2106,
+        "fixed_tss": 0.6648,
+        "refreshed_tss": 0.6962
+      },
+      {
+        "month": "2025-09",
+        "n": 2126,
+        "fixed_tss": 0.6762,
+        "refreshed_tss": 0.6414
+      },
+      {
+        "month": "2025-10",
+        "n": 2189,
+        "fixed_tss": 0.6249,
+        "refreshed_tss": 0.6639
+      },
+      {
+        "month": "2025-11",
+        "n": 2102,
+        "fixed_tss": 0.6493,
+        "refreshed_tss": 0.7568
+      },
+      {
+        "month": "2025-12",
+        "n": 2413,
+        "fixed_tss": 0.6902,
+        "refreshed_tss": 0.7209
+      },
+      {
+        "month": "2026-01",
+        "n": 2323,
+        "fixed_tss": 0.6447,
+        "refreshed_tss": 0.7052
+      },
+      {
+        "month": "2026-02",
+        "n": 2060,
+        "fixed_tss": 0.7152,
+        "refreshed_tss": 0.775
+      },
+      {
+        "month": "2026-03",
+        "n": 2046,
+        "fixed_tss": 0.6173,
+        "refreshed_tss": 0.7198
+      },
+      {
+        "month": "2026-04",
+        "n": 2121,
+        "fixed_tss": 0.6935,
+        "refreshed_tss": 0.7141
+      },
+      {
+        "month": "2026-05",
+        "n": 2339,
+        "fixed_tss": 0.6616,
+        "refreshed_tss": 0.7748
+      },
+      {
+        "month": "2026-06",
+        "n": 2241,
+        "fixed_tss": 0.6714,
+        "refreshed_tss": 0.7067
+      },
+      {
+        "month": "2026-07",
+        "n": 2014,
+        "fixed_tss": 0.7179,
+        "refreshed_tss": 0.7548
+      },
+      {
+        "month": "2026-08",
+        "n": 1974,
+        "fixed_tss": 0.6509,
+        "refreshed_tss": 0.7841
+      },
+      {
+        "month": "2026-09",
+        "n": 1892,
+        "fixed_tss": 0.6006,
+        "refreshed_tss": 0.6601
+      }
+    ],
+    "H9_fixed_slope_per_month": {
+      "value": -0.0042,
+      "ci95": [
+        -0.0064,
+        -0.0019
+      ]
+    },
+    "H10_refresh_advantage": {
+      "value": 0.0451,
+      "ci95": [
+        0.0337,
+        0.0584
+      ]
+    }
+  }
+}

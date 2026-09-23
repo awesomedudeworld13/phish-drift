@@ -116,16 +116,31 @@ def _tss(y, pred):
     return pred[pos].mean() - pred[neg].mean()
 
 
-def p2(f: pd.DataFrame) -> dict:
-    fixed = train_rf(date_split(f, P2_FIXED["fit"], P2_FIXED["val"], ("9999", "9999")))
+P2_FIXED_D2 = {"fit": ("2024-10-13", "2024-11-30"), "val": ("2024-12-01", "2024-12-31")}
+
+
+def _month_span(m: str) -> tuple[str, str]:
+    return f"{m}-01", pd.Period(m).end_time.date().isoformat()
+
+
+def p2(f: pd.DataFrame, corrected: bool = False) -> dict:
+    """corrected=True is deviation D2: validation = the whole previous month (the pre-registered
+    'last 14 days' windows often held zero benign rows, since benign dates sit inside each
+    month's crawl window)."""
+    fx = P2_FIXED_D2 if corrected else P2_FIXED
+    fixed = train_rf(date_split(f, fx["fit"], fx["val"], ("9999", "9999")))
     test_months = sorted(m for m in f.month.unique() if m >= "2025-01")
-    per, seen_fixed = [], set(_between(f, (P2_FIXED["fit"][0], P2_FIXED["val"][1])).domain)
+    per, seen_fixed = [], set(_between(f, (fx["fit"][0], fx["val"][1])).domain)
     for i, m in enumerate(test_months):
         prev = [str(p)[:7] for p in pd.period_range(end=pd.Period(m) - 1, periods=3, freq="M")]
         fit_end = (pd.Period(prev[-1]).end_time - pd.Timedelta(days=14)).date().isoformat()
         val_start = (pd.Period(prev[-1]).end_time - pd.Timedelta(days=13)).date().isoformat()
-        sp = date_split(f, (f"{prev[0]}-01", fit_end), (val_start, pd.Period(prev[-1]).end_time.date().isoformat()),
-                        (f"{m}-01", pd.Period(m).end_time.date().isoformat()))
+        if corrected:                                      # fit m-3..m-2, validate on all of m-1
+            sp = date_split(f, (_month_span(prev[0])[0], _month_span(prev[1])[1]), _month_span(prev[2]),
+                            _month_span(m))
+        else:
+            sp = date_split(f, (f"{prev[0]}-01", fit_end), (val_start, pd.Period(prev[-1]).end_time.date().isoformat()),
+                            (f"{m}-01", pd.Period(m).end_time.date().isoformat()))
         refreshed = train_rf(sp)
         te = sp.test[~sp.test.domain.isin(seen_fixed)]      # disjoint from BOTH models' training domains
         per.append({"month": m, "elapsed": i + 1, "y": te.y.to_numpy(), "g": te.domain.to_numpy(),
@@ -210,7 +225,12 @@ def main():
 
 if __name__ == "__main__":
     import sys
-    if "--prospective" in sys.argv:
+    if "--p2-corrected" in sys.argv:
+        res = json.loads(OUT.read_text(encoding="utf-8"))
+        res["P2_decay_corrected_D2"] = p2(load_corpus("realistic"), corrected=True)
+        OUT.write_text(json.dumps(res, indent=2, default=str), encoding="utf-8")
+        print(json.dumps(res["P2_decay_corrected_D2"], indent=2))
+    elif "--prospective" in sys.argv:
         print(json.dumps(score_prospective(), indent=2))
     else:
         main()
