@@ -392,3 +392,13 @@ Kaitholikkal (which collapse) than for Hannousse (which does not).
 Status at registration: **1 of 14 days collected, 13 remaining.** No
 live-trained model has been fitted. These predictions are recorded before any
 exists, which is the only reason they count.
+
+## Deviations
+
+**D1 (2026-09-26): Study currently is in its testing phase trying to gather
+more data for the overall project and see the difference in ML models, 7/14
+days collected: fallback when Common Crawl index server fails.** On 9/25 the
+Common Crawl index servers failed w/o error so that day got 0 data. The benign
+sampling rule stays the same. The server now returns nothing and collector
+reads the same Common Crawl CDN records when this happens, and failures are
+now counted. 9/25 stays as it was with no backfill.
