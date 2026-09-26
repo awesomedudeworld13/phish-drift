@@ -79,3 +79,14 @@ GitHub can keep commits that are no longer on any branch reachable by their
 hash for a while after a force-push. Removing those cached copies requires a
 request to GitHub Support, which the repository owner has to make. Forks and
 existing local clones made before 2026-09-23 also still hold the old history.
+
+## Collection incidents
+
+- **2026-09-25: no Common Crawl rows.** Every index-server query in that
+  morning's run failed, and the collector skipped each one silently, so the
+  snapshot has 0 `commoncrawl` rows (phishing and templated rows are intact).
+  The day is left as collected rather than re-run: a rerun would draw a
+  different phishing sample than the 12:00 UTC one. Since then, failed queries
+  are tallied in the snapshot stats (`cc_errors`), and when the index server
+  returns nothing the collector reads the same crawl's records from the CDN's
+  CDX shards (`cc_cdn.py`, `cc_via: "cdn"` in stats).

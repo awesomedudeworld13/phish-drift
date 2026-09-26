@@ -45,6 +45,7 @@ import gzip
 import io
 import json
 import random
+import re
 import time
 import zipfile
 from dataclasses import dataclass
@@ -145,7 +146,14 @@ def fetch_tranco_domains(n: int = 50_000, cache: Path | None = None) -> list[str
 
 
 def latest_cc_collection() -> str:
-    return _get(CC_COLLINFO).json()[0]["id"]
+    try:
+        return _get(CC_COLLINFO).json()[0]["id"]
+    except requests.RequestException:
+        # The index server can be down; the CDN's crawl list names the same crawls.
+        r = requests.get("https://data.commoncrawl.org/crawl-data/index.html",
+                         headers=_HEADERS, timeout=60)
+        r.raise_for_status()
+        return sorted(set(re.findall(r"CC-MAIN-\d{4}-\d{2}", r.text)))[-1]
 
 
 def fetch_commoncrawl_urls(domains: list[str], per_domain: int = 25,
@@ -178,6 +186,7 @@ def fetch_commoncrawl_urls(domains: list[str], per_domain: int = 25,
                 headers=_HEADERS, timeout=(10, 60),
             )
             if r.status_code != 200:
+                _count_error(stats, str(r.status_code))
                 continue
             kept = 0
             for line in r.text.splitlines():
@@ -195,11 +204,19 @@ def fetch_commoncrawl_urls(domains: list[str], per_domain: int = 25,
                     kept += 1
                     if kept >= per_domain:
                         break
-        except requests.RequestException:
+        except requests.RequestException as exc:
+            _count_error(stats, type(exc).__name__)
             continue
         time.sleep(CC_DELAY_SECONDS)
 
     return out
+
+
+def _count_error(stats: dict | None, key: str) -> None:
+    """Tally failed index queries, so an outage day is visible in the stats, not just empty."""
+    if stats is not None:
+        errs = stats.setdefault("cc_errors", {})
+        errs[key] = errs.get(key, 0) + 1
 
 
 def templated_benign(domains: list[str], n: int) -> list[str]:
@@ -245,7 +262,19 @@ def build_snapshot(n_benign_realistic: int = 300,
     domains = fetch_tranco_domains(tranco_pool, cache=cache_dir / "tranco.json")
     rng.shuffle(domains)
 
-    realistic = fetch_commoncrawl_urls(domains, per_domain=25, max_domains=40, stats=stats)
+    collection = latest_cc_collection()
+    realistic = fetch_commoncrawl_urls(domains, collection=collection, per_domain=25,
+                                       max_domains=40, stats=stats)
+    if not realistic:
+        # Index server down (2026-09-25): read the same records from the CDN's
+        # CDX shards instead. Same crawl, same domains, same filter.
+        from . import cc_cdn
+        try:
+            realistic = cc_cdn.fetch_commoncrawl_urls(domains, collection=collection,
+                                                      per_domain=25, max_domains=40)
+            stats["cc_via"] = "cdn"
+        except (cc_cdn.Blocked, requests.RequestException) as exc:
+            stats["cc_cdn_error"] = str(exc)[:200]
     realistic = realistic[:n_benign_realistic]
     rows += [{"url": u, "y": 0, "source": "commoncrawl"} for u in realistic]
     stats["benign_realistic"] = len(realistic)

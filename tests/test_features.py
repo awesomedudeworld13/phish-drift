@@ -314,6 +314,43 @@ def test_sealed_snapshots_round_trip_and_hide_urls():
             os.environ["FEED_KEY"] = old
 
 
+def test_commoncrawl_outage_is_counted_not_silent():
+    """2026-09-25: every index query failed and the stats just said 0 benign URLs."""
+    import requests
+    from phishdrift import collect
+
+    class Resp:
+        status_code = 503
+        text = ""
+
+    calls = []
+
+    def fake_get(url, **kw):
+        calls.append(url)
+        if "collinfo" in url:
+            raise requests.ConnectionError("index down")
+        if "crawl-data/index.html" in url:
+            r = Resp(); r.status_code = 200
+            r.text = "CC-MAIN-2026-34 CC-MAIN-2026-39"
+            r.raise_for_status = lambda: None
+            return r
+        if "boom" in kw.get("params", {}).get("url", ""):
+            raise requests.Timeout("slow")
+        return Resp()
+
+    real_get, real_sleep = requests.get, collect.time.sleep
+    requests.get, collect.time.sleep = fake_get, lambda s: None
+    try:
+        assert collect.latest_cc_collection() == "CC-MAIN-2026-39"
+        stats = {}
+        out = collect.fetch_commoncrawl_urls(["a.com", "b.com", "boom.com"],
+                                             collection="X", stats=stats)
+    finally:
+        requests.get, collect.time.sleep = real_get, real_sleep
+    assert out == []
+    assert stats["cc_errors"] == {"503": 2, "Timeout": 1}, stats
+
+
 def _run_all():
     failures = 0
     for name, fn in sorted(globals().items()):
