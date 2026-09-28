@@ -1,0 +1,13 @@
+{
+  "date": "2026-09-28",
+  "openphish": 300,
+  "urlhaus": 2000,
+  "cc_errors": {
+    "404": 6,
+    "504": 4,
+    "502": 6
+  },
+  "benign_realistic": 300,
+  "benign_templated": 300,
+  "rows": 2879
+}
