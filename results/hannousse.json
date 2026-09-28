@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-21T22:49:07+00:00",
+  "generated_at_utc": "2026-09-28T16:06:48+00:00",
   "bootstrap_resamples": 1000,
   "benchmark": {
     "key": "hannousse",
@@ -159,51 +159,51 @@
     "cell3_live_templated_benign": {
       "name": "cell3_live_templated_benign",
       "description": "Live feeds, benign rendered in the benchmark's own surface form (https://www.<domain>) \u2014 era changes, construction held fixed.",
-      "n": 1196,
-      "base_rate": 0.501672,
-      "peak_tss": 0.961622,
-      "peak_threshold": 0.331205,
+      "n": 5172,
+      "base_rate": 0.490526,
+      "peak_tss": 0.959038,
+      "peak_threshold": 0.326106,
       "operating_points": {
         "f1": {
-          "n": 1196,
-          "base_rate": 0.501672,
+          "n": 5172,
+          "base_rate": 0.490526,
           "threshold": 0.469552,
-          "tp": 527,
-          "fp": 2,
-          "fn": 73,
-          "tn": 594,
-          "recall": 0.878333,
-          "false_alarm_rate": 0.003356,
-          "precision": 0.996219,
-          "f1": 0.93357,
-          "accuracy": 0.937291,
-          "tss": 0.874978,
-          "brier": 0.062916,
-          "brier_skill": 0.748333,
+          "tp": 2273,
+          "fp": 7,
+          "fn": 264,
+          "tn": 2628,
+          "recall": 0.89594,
+          "false_alarm_rate": 0.002657,
+          "precision": 0.99693,
+          "f1": 0.943741,
+          "accuracy": 0.947602,
+          "tss": 0.893284,
+          "brier": 0.057789,
+          "brier_skill": 0.768761,
           "tss_ci95": [
-            0.810293,
-            0.91796
+            0.843815,
+            0.926246
           ]
         },
         "tss": {
-          "n": 1196,
-          "base_rate": 0.501672,
+          "n": 5172,
+          "base_rate": 0.490526,
           "threshold": 0.469552,
-          "tp": 527,
-          "fp": 2,
-          "fn": 73,
-          "tn": 594,
-          "recall": 0.878333,
-          "false_alarm_rate": 0.003356,
-          "precision": 0.996219,
-          "f1": 0.93357,
-          "accuracy": 0.937291,
-          "tss": 0.874978,
-          "brier": 0.062916,
-          "brier_skill": 0.748333,
+          "tp": 2273,
+          "fp": 7,
+          "fn": 264,
+          "tn": 2628,
+          "recall": 0.89594,
+          "false_alarm_rate": 0.002657,
+          "precision": 0.99693,
+          "f1": 0.943741,
+          "accuracy": 0.947602,
+          "tss": 0.893284,
+          "brier": 0.057789,
+          "brier_skill": 0.768761,
           "tss_ci95": [
-            0.810293,
-            0.91796
+            0.843815,
+            0.926246
           ]
         }
       }
@@ -211,51 +211,51 @@
     "cell4_live_realistic_benign": {
       "name": "cell4_live_realistic_benign",
       "description": "Live feeds, benign drawn from Common Crawl with real paths \u2014 operational reality.",
-      "n": 1150,
-      "base_rate": 0.521739,
-      "peak_tss": 0.462576,
-      "peak_threshold": 0.68546,
+      "n": 4457,
+      "base_rate": 0.569217,
+      "peak_tss": 0.513981,
+      "peak_threshold": 0.63034,
       "operating_points": {
         "f1": {
-          "n": 1150,
-          "base_rate": 0.521739,
+          "n": 4457,
+          "base_rate": 0.569217,
           "threshold": 0.469552,
-          "tp": 527,
-          "fp": 303,
-          "fn": 73,
-          "tn": 247,
-          "recall": 0.878333,
-          "false_alarm_rate": 0.550909,
-          "precision": 0.63494,
-          "f1": 0.737063,
-          "accuracy": 0.673043,
-          "tss": 0.327424,
-          "brier": 0.196931,
-          "brier_skill": 0.210785,
+          "tp": 2273,
+          "fp": 859,
+          "fn": 264,
+          "tn": 1061,
+          "recall": 0.89594,
+          "false_alarm_rate": 0.447396,
+          "precision": 0.725734,
+          "f1": 0.801905,
+          "accuracy": 0.748037,
+          "tss": 0.448544,
+          "brier": 0.167608,
+          "brier_skill": 0.316469,
           "tss_ci95": [
-            0.167527,
-            0.481892
+            0.35076,
+            0.535865
           ]
         },
         "tss": {
-          "n": 1150,
-          "base_rate": 0.521739,
+          "n": 4457,
+          "base_rate": 0.569217,
           "threshold": 0.469552,
-          "tp": 527,
-          "fp": 303,
-          "fn": 73,
-          "tn": 247,
-          "recall": 0.878333,
-          "false_alarm_rate": 0.550909,
-          "precision": 0.63494,
-          "f1": 0.737063,
-          "accuracy": 0.673043,
-          "tss": 0.327424,
-          "brier": 0.196931,
-          "brier_skill": 0.210785,
+          "tp": 2273,
+          "fp": 859,
+          "fn": 264,
+          "tn": 1061,
+          "recall": 0.89594,
+          "false_alarm_rate": 0.447396,
+          "precision": 0.725734,
+          "f1": 0.801905,
+          "accuracy": 0.748037,
+          "tss": 0.448544,
+          "brier": 0.167608,
+          "brier_skill": 0.316469,
           "tss_ci95": [
-            0.167527,
-            0.481892
+            0.35076,
+            0.535865
           ]
         }
       }
@@ -264,11 +264,11 @@
   "attribution_tss": {
     "f1": {
       "split_leakage": 0.084373,
-      "total": 0.475606
+      "total": 0.354486
     },
     "tss": {
       "split_leakage": 0.08787,
-      "total": 0.479103
+      "total": 0.357983
     }
   },
   "attribution_applicable": {
@@ -298,10 +298,10 @@
   ],
   "total_gap_ci95": {
     "operating_point": "tss",
-    "point_estimate": 0.384751,
+    "point_estimate": 0.284666,
     "ci95": [
-      0.225293,
-      0.516906
+      0.205467,
+      0.372692
     ],
     "excludes_zero": true
   },
@@ -341,38 +341,38 @@
       "brier_skill": -0.480744
     },
     "cell3_live_templated_benign": {
-      "n": 1196,
-      "base_rate": 0.501672,
+      "n": 5172,
+      "base_rate": 0.490526,
       "threshold": 0.5,
-      "tp": 574,
+      "tp": 2425,
       "fp": 0,
-      "fn": 26,
-      "tn": 596,
-      "recall": 0.956667,
+      "fn": 112,
+      "tn": 2635,
+      "recall": 0.955853,
       "false_alarm_rate": 0.0,
       "precision": 1.0,
-      "f1": 0.977853,
-      "accuracy": 0.978261,
-      "tss": 0.956667,
-      "brier": 0.021739,
-      "brier_skill": 0.913043
+      "f1": 0.977428,
+      "accuracy": 0.978345,
+      "tss": 0.955853,
+      "brier": 0.021655,
+      "brier_skill": 0.913349
     },
     "cell4_live_realistic_benign": {
-      "n": 1150,
-      "base_rate": 0.521739,
+      "n": 4457,
+      "base_rate": 0.569217,
       "threshold": 0.5,
-      "tp": 574,
-      "fp": 544,
-      "fn": 26,
-      "tn": 6,
-      "recall": 0.956667,
-      "false_alarm_rate": 0.989091,
-      "precision": 0.513417,
-      "f1": 0.668219,
-      "accuracy": 0.504348,
-      "tss": -0.032424,
-      "brier": 0.495652,
-      "brier_skill": -0.986364
+      "tp": 2425,
+      "fp": 1891,
+      "fn": 112,
+      "tn": 29,
+      "recall": 0.955853,
+      "false_alarm_rate": 0.984896,
+      "precision": 0.561863,
+      "f1": 0.707719,
+      "accuracy": 0.550595,
+      "tss": -0.029042,
+      "brier": 0.449405,
+      "brier_skill": -0.832744
     }
   },
   "sampling_confound": {
@@ -387,25 +387,25 @@
       "n_equals",
       "n_ampersands"
     ],
-    "n": 1150,
-    "peak_tss_path_shape_only": 0.516061,
-    "threshold": 0.571688,
+    "n": 4457,
+    "peak_tss_path_shape_only": 0.547275,
+    "threshold": 0.449727,
     "preregistered_ceiling": 0.3,
     "ceiling_breached": true,
     "path_presence_rate": {
-      "benign": 0.901818,
-      "phishing": 0.646667
+      "benign": 0.888542,
+      "phishing": 0.533701
     },
     "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
-    "verdict": "BREACHED: 0.516 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 90.2% of BENIGN URLs carry a path against 64.7% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.516 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
+    "verdict": "BREACHED: 0.547 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 88.9% of BENIGN URLs carry a path against 53.4% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.547 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
   },
   "live_training": {
     "readiness": {
       "ready": false,
-      "reason": "2 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
-      "n_days": 2,
-      "n_rows": 1150,
-      "days_needed": 12,
+      "reason": "9 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
+      "n_days": 9,
+      "n_rows": 4457,
+      "days_needed": 5,
       "thresholds": {
         "min_train_days": 10,
         "min_holdout_days": 4,
@@ -413,57 +413,57 @@
         "min_positives_per_side": 100
       }
     },
-    "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 2 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+    "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 9 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
   },
   "robustness": {
     "urlhaus_malware": {
       "name": "robustness_urlhaus_malware",
       "description": "Live URLhaus malware-distribution URLs vs realistic benign \u2014 a different positive class, same benchmark-trained model.",
-      "n": 3135,
-      "base_rate": 0.824561,
-      "peak_tss": 0.912921,
-      "peak_threshold": 0.878263,
+      "n": 8881,
+      "base_rate": 0.783808,
+      "peak_tss": 0.891623,
+      "peak_threshold": 0.882432,
       "operating_points": {
         "f1": {
-          "n": 3135,
-          "base_rate": 0.824561,
+          "n": 8881,
+          "base_rate": 0.783808,
           "threshold": 0.469552,
-          "tp": 2571,
-          "fp": 303,
-          "fn": 14,
-          "tn": 247,
-          "recall": 0.994584,
-          "false_alarm_rate": 0.550909,
-          "precision": 0.894572,
-          "f1": 0.941931,
-          "accuracy": 0.898884,
-          "tss": 0.443675,
-          "brier": 0.061166,
-          "brier_skill": 0.577173,
+          "tp": 6933,
+          "fp": 859,
+          "fn": 28,
+          "tn": 1061,
+          "recall": 0.995978,
+          "false_alarm_rate": 0.447396,
+          "precision": 0.889759,
+          "f1": 0.939877,
+          "accuracy": 0.900124,
+          "tss": 0.548582,
+          "brier": 0.065536,
+          "brier_skill": 0.61325,
           "tss_ci95": [
-            0.30613,
-            0.595739
+            0.474398,
+            0.623026
           ]
         },
         "tss": {
-          "n": 3135,
-          "base_rate": 0.824561,
+          "n": 8881,
+          "base_rate": 0.783808,
           "threshold": 0.469552,
-          "tp": 2571,
-          "fp": 303,
-          "fn": 14,
-          "tn": 247,
-          "recall": 0.994584,
-          "false_alarm_rate": 0.550909,
-          "precision": 0.894572,
-          "f1": 0.941931,
-          "accuracy": 0.898884,
-          "tss": 0.443675,
-          "brier": 0.061166,
-          "brier_skill": 0.577173,
+          "tp": 6933,
+          "fp": 859,
+          "fn": 28,
+          "tn": 1061,
+          "recall": 0.995978,
+          "false_alarm_rate": 0.447396,
+          "precision": 0.889759,
+          "f1": 0.939877,
+          "accuracy": 0.900124,
+          "tss": 0.548582,
+          "brier": 0.065536,
+          "brier_skill": 0.61325,
           "tss_ci95": [
-            0.30613,
-            0.595739
+            0.474398,
+            0.623026
           ]
         }
       }
@@ -472,8 +472,8 @@
   "models": {
     "random_split": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-21T22:40:55+00:00",
-      "git_commit": "ed0b9b723cce260ebf46fd16b793790dd16cf4f8",
+      "trained_at_utc": "2026-09-28T15:59:10+00:00",
+      "git_commit": "9d937a210c7cbb5940e223061a4b364197ad7c56",
       "python": "3.12.14",
       "split_name": "random",
       "split_sizes": {
@@ -562,8 +562,8 @@
     },
     "domain_disjoint": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-21T22:40:58+00:00",
-      "git_commit": "ed0b9b723cce260ebf46fd16b793790dd16cf4f8",
+      "trained_at_utc": "2026-09-28T15:59:13+00:00",
+      "git_commit": "9d937a210c7cbb5940e223061a4b364197ad7c56",
       "python": "3.12.14",
       "split_name": "domain_disjoint",
       "split_sizes": {
@@ -652,18 +652,18 @@
     }
   },
   "live_corpus": {
-    "n_rows": 4331,
-    "n_phishing": 3185,
+    "n_rows": 14053,
+    "n_phishing": 9498,
     "by_source": {
-      "urlhaus": 2585,
-      "openphish": 600,
-      "tranco_templated": 596,
-      "commoncrawl": 550
+      "urlhaus": 6961,
+      "tranco_templated": 2635,
+      "openphish": 2537,
+      "commoncrawl": 1920
     },
-    "n_domains": 2086,
+    "n_domains": 6543,
     "span": [
       "2026-09-20",
-      "2026-09-21"
+      "2026-09-28"
     ]
   }
 }
