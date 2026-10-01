@@ -13,3 +13,4 @@ bd68732f2dcc1f2ab6b56e200ec10d6d9ae11d149a5edbd253ef6fc873351162  testing_new/li
 6da4374073c265e1890386c6045d30be2dee86295455be272f6efc817f8586a3  testing_new/live/2026-09-28.csv.gz.enc
 29335fb2fdf799de3eaa6098533dc6d521c538182177faddf7e01ac32f6d8236  testing_new/live/2026-09-29.csv.gz.enc
 2d6ec83831b65cde24f5fa6f91e660dfa207aae4e1397e2ad7cdf9b0cd8c36ec  testing_new/live/2026-09-30.csv.gz.enc
+34fcdfb9ccb1f4b8abf57dce70d3f5324cf7b9ff24e826bca5d7d1ee869625dc  testing_new/live/2026-10-01.csv.gz.enc
