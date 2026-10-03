@@ -1,5 +1,5 @@
 {
-  "generated_at_utc": "2026-09-28T16:06:48+00:00",
+  "generated_at_utc": "2026-10-03T15:46:42+00:00",
   "bootstrap_resamples": 1000,
   "benchmark": {
     "key": "hannousse",
@@ -159,51 +159,51 @@
     "cell3_live_templated_benign": {
       "name": "cell3_live_templated_benign",
       "description": "Live feeds, benign rendered in the benchmark's own surface form (https://www.<domain>) \u2014 era changes, construction held fixed.",
-      "n": 5172,
-      "base_rate": 0.490526,
-      "peak_tss": 0.959038,
-      "peak_threshold": 0.326106,
+      "n": 8041,
+      "base_rate": 0.496456,
+      "peak_tss": 0.961292,
+      "peak_threshold": 0.334996,
       "operating_points": {
         "f1": {
-          "n": 5172,
-          "base_rate": 0.490526,
+          "n": 8041,
+          "base_rate": 0.496456,
           "threshold": 0.469552,
-          "tp": 2273,
-          "fp": 7,
-          "fn": 264,
-          "tn": 2628,
-          "recall": 0.89594,
-          "false_alarm_rate": 0.002657,
-          "precision": 0.99693,
-          "f1": 0.943741,
-          "accuracy": 0.947602,
-          "tss": 0.893284,
-          "brier": 0.057789,
-          "brier_skill": 0.768761,
+          "tp": 3605,
+          "fp": 13,
+          "fn": 387,
+          "tn": 4036,
+          "recall": 0.903056,
+          "false_alarm_rate": 0.003211,
+          "precision": 0.996407,
+          "f1": 0.947438,
+          "accuracy": 0.950255,
+          "tss": 0.899845,
+          "brier": 0.056819,
+          "brier_skill": 0.772713,
           "tss_ci95": [
-            0.843815,
-            0.926246
+            0.850764,
+            0.931085
           ]
         },
         "tss": {
-          "n": 5172,
-          "base_rate": 0.490526,
+          "n": 8041,
+          "base_rate": 0.496456,
           "threshold": 0.469552,
-          "tp": 2273,
-          "fp": 7,
-          "fn": 264,
-          "tn": 2628,
-          "recall": 0.89594,
-          "false_alarm_rate": 0.002657,
-          "precision": 0.99693,
-          "f1": 0.943741,
-          "accuracy": 0.947602,
-          "tss": 0.893284,
-          "brier": 0.057789,
-          "brier_skill": 0.768761,
+          "tp": 3605,
+          "fp": 13,
+          "fn": 387,
+          "tn": 4036,
+          "recall": 0.903056,
+          "false_alarm_rate": 0.003211,
+          "precision": 0.996407,
+          "f1": 0.947438,
+          "accuracy": 0.950255,
+          "tss": 0.899845,
+          "brier": 0.056819,
+          "brier_skill": 0.772713,
           "tss_ci95": [
-            0.843815,
-            0.926246
+            0.850764,
+            0.931085
           ]
         }
       }
@@ -211,51 +211,51 @@
     "cell4_live_realistic_benign": {
       "name": "cell4_live_realistic_benign",
       "description": "Live feeds, benign drawn from Common Crawl with real paths \u2014 operational reality.",
-      "n": 4457,
-      "base_rate": 0.569217,
-      "peak_tss": 0.513981,
-      "peak_threshold": 0.63034,
+      "n": 6942,
+      "base_rate": 0.57505,
+      "peak_tss": 0.518521,
+      "peak_threshold": 0.629995,
       "operating_points": {
         "f1": {
-          "n": 4457,
-          "base_rate": 0.569217,
+          "n": 6942,
+          "base_rate": 0.57505,
           "threshold": 0.469552,
-          "tp": 2273,
-          "fp": 859,
-          "fn": 264,
-          "tn": 1061,
-          "recall": 0.89594,
-          "false_alarm_rate": 0.447396,
-          "precision": 0.725734,
-          "f1": 0.801905,
-          "accuracy": 0.748037,
-          "tss": 0.448544,
-          "brier": 0.167608,
-          "brier_skill": 0.316469,
+          "tp": 3605,
+          "fp": 1356,
+          "fn": 387,
+          "tn": 1594,
+          "recall": 0.903056,
+          "false_alarm_rate": 0.459661,
+          "precision": 0.726668,
+          "f1": 0.805317,
+          "accuracy": 0.74892,
+          "tss": 0.443395,
+          "brier": 0.166803,
+          "brier_skill": 0.317408,
           "tss_ci95": [
-            0.35076,
-            0.535865
+            0.367108,
+            0.51683
           ]
         },
         "tss": {
-          "n": 4457,
-          "base_rate": 0.569217,
+          "n": 6942,
+          "base_rate": 0.57505,
           "threshold": 0.469552,
-          "tp": 2273,
-          "fp": 859,
-          "fn": 264,
-          "tn": 1061,
-          "recall": 0.89594,
-          "false_alarm_rate": 0.447396,
-          "precision": 0.725734,
-          "f1": 0.801905,
-          "accuracy": 0.748037,
-          "tss": 0.448544,
-          "brier": 0.167608,
-          "brier_skill": 0.316469,
+          "tp": 3605,
+          "fp": 1356,
+          "fn": 387,
+          "tn": 1594,
+          "recall": 0.903056,
+          "false_alarm_rate": 0.459661,
+          "precision": 0.726668,
+          "f1": 0.805317,
+          "accuracy": 0.74892,
+          "tss": 0.443395,
+          "brier": 0.166803,
+          "brier_skill": 0.317408,
           "tss_ci95": [
-            0.35076,
-            0.535865
+            0.367108,
+            0.51683
           ]
         }
       }
@@ -264,11 +264,11 @@
   "attribution_tss": {
     "f1": {
       "split_leakage": 0.084373,
-      "total": 0.354486
+      "total": 0.359635
     },
     "tss": {
       "split_leakage": 0.08787,
-      "total": 0.357983
+      "total": 0.363132
     }
   },
   "attribution_applicable": {
@@ -298,10 +298,10 @@
   ],
   "total_gap_ci95": {
     "operating_point": "tss",
-    "point_estimate": 0.284666,
+    "point_estimate": 0.297,
     "ci95": [
-      0.205467,
-      0.372692
+      0.217471,
+      0.367605
     ],
     "excludes_zero": true
   },
@@ -341,38 +341,38 @@
       "brier_skill": -0.480744
     },
     "cell3_live_templated_benign": {
-      "n": 5172,
-      "base_rate": 0.490526,
+      "n": 8041,
+      "base_rate": 0.496456,
       "threshold": 0.5,
-      "tp": 2425,
+      "tp": 3789,
       "fp": 0,
-      "fn": 112,
-      "tn": 2635,
-      "recall": 0.955853,
+      "fn": 203,
+      "tn": 4049,
+      "recall": 0.949148,
       "false_alarm_rate": 0.0,
       "precision": 1.0,
-      "f1": 0.977428,
-      "accuracy": 0.978345,
-      "tss": 0.955853,
-      "brier": 0.021655,
-      "brier_skill": 0.913349
+      "f1": 0.973911,
+      "accuracy": 0.974754,
+      "tss": 0.949148,
+      "brier": 0.025246,
+      "brier_skill": 0.899012
     },
     "cell4_live_realistic_benign": {
-      "n": 4457,
-      "base_rate": 0.569217,
+      "n": 6942,
+      "base_rate": 0.57505,
       "threshold": 0.5,
-      "tp": 2425,
-      "fp": 1891,
-      "fn": 112,
-      "tn": 29,
-      "recall": 0.955853,
-      "false_alarm_rate": 0.984896,
-      "precision": 0.561863,
-      "f1": 0.707719,
-      "accuracy": 0.550595,
-      "tss": -0.029042,
-      "brier": 0.449405,
-      "brier_skill": -0.832744
+      "tp": 3789,
+      "fp": 2904,
+      "fn": 203,
+      "tn": 46,
+      "recall": 0.949148,
+      "false_alarm_rate": 0.984407,
+      "precision": 0.566114,
+      "f1": 0.709219,
+      "accuracy": 0.552434,
+      "tss": -0.035258,
+      "brier": 0.447566,
+      "brier_skill": -0.831527
     }
   },
   "sampling_confound": {
@@ -387,25 +387,25 @@
       "n_equals",
       "n_ampersands"
     ],
-    "n": 4457,
-    "peak_tss_path_shape_only": 0.547275,
-    "threshold": 0.449727,
+    "n": 6942,
+    "peak_tss_path_shape_only": 0.554627,
+    "threshold": 0.605484,
     "preregistered_ceiling": 0.3,
     "ceiling_breached": true,
     "path_presence_rate": {
-      "benign": 0.888542,
-      "phishing": 0.533701
+      "benign": 0.849492,
+      "phishing": 0.474449
     },
     "interpretation": "This asks whether our own two collection pipelines (OpenPhish for phishing, Common Crawl for benign) differ in URL structure enough that a model could separate them without learning anything about phishing. Near 0 means they are structurally indistinguishable.",
-    "verdict": "BREACHED: 0.547 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 88.9% of BENIGN URLs carry a path against 53.4% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.547 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
+    "verdict": "BREACHED: 0.555 exceeds the pre-registered ceiling of 0.3. Path shape alone carries real separating power in our live corpus, so we cannot claim our two streams are structurally equivalent, and any statement about how much genuine phishing signal lives in path structure must be withheld.\n\nWhat this does NOT do is explain the headline collapse, and the measured direction is why. In this live corpus 84.9% of BENIGN URLs carry a path against 47.4% of phishing ones -- benign URLs are the ones with deeper structure, the opposite of what the benchmark teaches. A benchmark-trained model that learned 'a path means phishing' is therefore not merely uninformed on this feature, it is anti-correlated with reality, which is exactly why its false-alarm rate is 1.000. The separating information is present and a model given only path shape reaches 0.555 with it; the benchmark-trained model reaches 0.000 because it learned the sign backwards. Re-sampling benign URLs to be shallower would move our corpus toward the benchmark's shape and flatter the model, not penalise it, so the headline is a lower bound on the collapse."
   },
   "live_training": {
     "readiness": {
-      "ready": false,
-      "reason": "9 of 14 days collected; a temporal split needs 10 training days and 4 holdout days",
-      "n_days": 9,
-      "n_rows": 4457,
-      "days_needed": 5,
+      "ready": true,
+      "reason": "sufficient live history",
+      "n_days": 14,
+      "n_rows": 6942,
+      "days_needed": 0,
       "thresholds": {
         "min_train_days": 10,
         "min_holdout_days": 4,
@@ -413,57 +413,260 @@
         "min_positives_per_side": 100
       }
     },
-    "question": "Does training on live data close the benchmark-to-operational gap? Not yet answerable: 9 of 14 days collected; a temporal split needs 10 training days and 4 holdout days."
+    "cells": {
+      "A_benchmark_trained_on_benchmark": {
+        "n": 1714,
+        "base_rate": 0.572929,
+        "threshold": 0.469552,
+        "tp": 915,
+        "fp": 156,
+        "fn": 67,
+        "tn": 576,
+        "recall": 0.931772,
+        "false_alarm_rate": 0.213115,
+        "precision": 0.854342,
+        "f1": 0.891378,
+        "accuracy": 0.869895,
+        "tss": 0.718657,
+        "brier": 0.086042,
+        "brier_skill": 0.648349,
+        "tss_ci95": [
+          0.570329,
+          0.82975
+        ],
+        "description": "Benchmark-trained model on its own held-out benchmark test."
+      },
+      "B_benchmark_trained_on_live": {
+        "n": 1160,
+        "base_rate": 0.268966,
+        "threshold": 0.469552,
+        "tp": 249,
+        "fp": 352,
+        "fn": 63,
+        "tn": 496,
+        "recall": 0.798077,
+        "false_alarm_rate": 0.415094,
+        "precision": 0.414309,
+        "f1": 0.545455,
+        "accuracy": 0.642241,
+        "tss": 0.382983,
+        "brier": 0.219258,
+        "brier_skill": -0.115119,
+        "tss_ci95": [
+          0.23585,
+          0.514415
+        ],
+        "description": "Benchmark-trained model on the live holdout \u2014 the deployed reality."
+      },
+      "C_live_trained_on_benchmark": {
+        "n": 1714,
+        "base_rate": 0.572929,
+        "threshold": 0.640536,
+        "tp": 744,
+        "fp": 392,
+        "fn": 238,
+        "tn": 340,
+        "recall": 0.757637,
+        "false_alarm_rate": 0.535519,
+        "precision": 0.65493,
+        "f1": 0.70255,
+        "accuracy": 0.632439,
+        "tss": 0.222118,
+        "brier": 0.246814,
+        "brier_skill": -0.008715,
+        "tss_ci95": [
+          -0.019756,
+          0.378631
+        ],
+        "description": "Live-trained model on the benchmark test \u2014 does live training generalise, or only fit this month's campaigns?"
+      },
+      "D_live_trained_on_live": {
+        "n": 1160,
+        "base_rate": 0.268966,
+        "threshold": 0.640536,
+        "tp": 247,
+        "fp": 110,
+        "fn": 65,
+        "tn": 738,
+        "recall": 0.791667,
+        "false_alarm_rate": 0.129717,
+        "precision": 0.691877,
+        "f1": 0.738416,
+        "accuracy": 0.849138,
+        "tss": 0.66195,
+        "brier": 0.151616,
+        "brier_skill": 0.228899,
+        "tss_ci95": [
+          0.541919,
+          0.760843
+        ],
+        "description": "Live-trained model on the live holdout \u2014 the best achievable with operational data alone."
+      }
+    },
+    "gap_A_minus_B": 0.335674,
+    "recovery_D_minus_B": 0.278967,
+    "recovery_ci95": [
+      0.106732,
+      0.452064
+    ],
+    "recovery_significant": true,
+    "recovery_fraction_of_gap": 0.831065,
+    "live_model": {
+      "model_version": 1,
+      "trained_at_utc": "2026-10-03T15:46:55+00:00",
+      "git_commit": "2d3a4250bef44fde26729c492a775b340bd1a6af",
+      "python": "3.12.14",
+      "split_name": "live_temporal",
+      "split_sizes": {
+        "train": 3878,
+        "val": 616,
+        "test": 1160,
+        "train_base_rate": 0.576844,
+        "test_base_rate": 0.268966
+      },
+      "estimator": "RandomForestClassifier",
+      "hyperparameters": {
+        "n_estimators": 300,
+        "max_depth": null,
+        "min_samples_leaf": 2,
+        "class_weight": "balanced_subsample",
+        "random_state": 20260920
+      },
+      "n_features": 52,
+      "thresholds": {
+        "f1": 0.640536,
+        "tss": 0.640536
+      },
+      "top_features": [
+        {
+          "name": "subdomain_length",
+          "importance": 0.101918
+        },
+        {
+          "name": "domain_length",
+          "importance": 0.086349
+        },
+        {
+          "name": "path_length",
+          "importance": 0.079919
+        },
+        {
+          "name": "n_slashes",
+          "importance": 0.057129
+        },
+        {
+          "name": "url_length",
+          "importance": 0.051426
+        },
+        {
+          "name": "is_https",
+          "importance": 0.048011
+        },
+        {
+          "name": "brand_token_count",
+          "importance": 0.047859
+        },
+        {
+          "name": "path_depth",
+          "importance": 0.044709
+        },
+        {
+          "name": "tld_is_common",
+          "importance": 0.041912
+        },
+        {
+          "name": "entropy_domain",
+          "importance": 0.037961
+        },
+        {
+          "name": "domain_longest_token",
+          "importance": 0.037067
+        },
+        {
+          "name": "letter_ratio",
+          "importance": 0.032251
+        },
+        {
+          "name": "digit_ratio",
+          "importance": 0.031775
+        },
+        {
+          "name": "special_ratio",
+          "importance": 0.026453
+        },
+        {
+          "name": "domain_vowel_ratio",
+          "importance": 0.026209
+        }
+      ],
+      "benchmark": "live",
+      "live_span": {
+        "train": [
+          "2026-09-20",
+          "2026-09-27"
+        ],
+        "val": [
+          "2026-09-28",
+          "2026-09-29"
+        ],
+        "holdout": [
+          "2026-09-30",
+          "2026-10-03"
+        ]
+      }
+    },
+    "question": "Does training on live data close the benchmark-to-operational gap?",
+    "answer": "Live training recovers +0.279 TSS over the benchmark-trained model on the same holdout (95% CI 0.107..0.452), against a gap of 0.336. The interval excludes zero, so live training measurably helps."
   },
   "robustness": {
     "urlhaus_malware": {
       "name": "robustness_urlhaus_malware",
       "description": "Live URLhaus malware-distribution URLs vs realistic benign \u2014 a different positive class, same benchmark-trained model.",
-      "n": 8881,
-      "base_rate": 0.783808,
-      "peak_tss": 0.891623,
-      "peak_threshold": 0.882432,
+      "n": 13173,
+      "base_rate": 0.776057,
+      "peak_tss": 0.867959,
+      "peak_threshold": 0.884294,
       "operating_points": {
         "f1": {
-          "n": 8881,
-          "base_rate": 0.783808,
+          "n": 13173,
+          "base_rate": 0.776057,
           "threshold": 0.469552,
-          "tp": 6933,
-          "fp": 859,
-          "fn": 28,
-          "tn": 1061,
-          "recall": 0.995978,
-          "false_alarm_rate": 0.447396,
-          "precision": 0.889759,
-          "f1": 0.939877,
-          "accuracy": 0.900124,
-          "tss": 0.548582,
-          "brier": 0.065536,
-          "brier_skill": 0.61325,
+          "tp": 10172,
+          "fp": 1356,
+          "fn": 51,
+          "tn": 1594,
+          "recall": 0.995011,
+          "false_alarm_rate": 0.459661,
+          "precision": 0.882373,
+          "f1": 0.935313,
+          "accuracy": 0.893191,
+          "tss": 0.53535,
+          "brier": 0.069858,
+          "brier_skill": 0.59804,
           "tss_ci95": [
-            0.474398,
-            0.623026
+            0.471722,
+            0.59879
           ]
         },
         "tss": {
-          "n": 8881,
-          "base_rate": 0.783808,
+          "n": 13173,
+          "base_rate": 0.776057,
           "threshold": 0.469552,
-          "tp": 6933,
-          "fp": 859,
-          "fn": 28,
-          "tn": 1061,
-          "recall": 0.995978,
-          "false_alarm_rate": 0.447396,
-          "precision": 0.889759,
-          "f1": 0.939877,
-          "accuracy": 0.900124,
-          "tss": 0.548582,
-          "brier": 0.065536,
-          "brier_skill": 0.61325,
+          "tp": 10172,
+          "fp": 1356,
+          "fn": 51,
+          "tn": 1594,
+          "recall": 0.995011,
+          "false_alarm_rate": 0.459661,
+          "precision": 0.882373,
+          "f1": 0.935313,
+          "accuracy": 0.893191,
+          "tss": 0.53535,
+          "brier": 0.069858,
+          "brier_skill": 0.59804,
           "tss_ci95": [
-            0.474398,
-            0.623026
+            0.471722,
+            0.59879
           ]
         }
       }
@@ -472,8 +675,8 @@
   "models": {
     "random_split": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-28T15:59:10+00:00",
-      "git_commit": "9d937a210c7cbb5940e223061a4b364197ad7c56",
+      "trained_at_utc": "2026-10-03T15:39:41+00:00",
+      "git_commit": "2d3a4250bef44fde26729c492a775b340bd1a6af",
       "python": "3.12.14",
       "split_name": "random",
       "split_sizes": {
@@ -562,8 +765,8 @@
     },
     "domain_disjoint": {
       "model_version": 1,
-      "trained_at_utc": "2026-09-28T15:59:13+00:00",
-      "git_commit": "9d937a210c7cbb5940e223061a4b364197ad7c56",
+      "trained_at_utc": "2026-10-03T15:39:43+00:00",
+      "git_commit": "2d3a4250bef44fde26729c492a775b340bd1a6af",
       "python": "3.12.14",
       "split_name": "domain_disjoint",
       "split_sizes": {
@@ -652,18 +855,18 @@
     }
   },
   "live_corpus": {
-    "n_rows": 14053,
-    "n_phishing": 9498,
+    "n_rows": 21214,
+    "n_phishing": 14215,
     "by_source": {
-      "urlhaus": 6961,
-      "tranco_templated": 2635,
-      "openphish": 2537,
-      "commoncrawl": 1920
+      "urlhaus": 10223,
+      "tranco_templated": 4049,
+      "openphish": 3992,
+      "commoncrawl": 2950
     },
-    "n_domains": 6543,
+    "n_domains": 9573,
     "span": [
       "2026-09-20",
-      "2026-09-28"
+      "2026-10-03"
     ]
   }
 }
