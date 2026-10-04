@@ -1,0 +1,9 @@
+{
+  "date": "2026-10-04",
+  "collected_utc": "2026-10-04T13:27:11+00:00",
+  "phish_after": "2026-10-03T12:00:05+00:00",
+  "phish_through": "2026-10-04T12:00:06+00:00",
+  "openphish_git": 307,
+  "benign_realistic": 581,
+  "rows": 888
+}
