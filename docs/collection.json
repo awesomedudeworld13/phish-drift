@@ -1,6 +1,6 @@
 {
-  "generated_at_utc": "2026-10-06T13:32:20+00:00",
-  "n_days": 17,
+  "generated_at_utc": "2026-10-07T13:41:46+00:00",
+  "n_days": 18,
   "days": [
     {
       "date": "2026-09-20",
@@ -236,6 +236,19 @@
         "openphish": 300,
         "tranco_templated": 277,
         "commoncrawl": 127
+      }
+    },
+    {
+      "date": "2026-10-07",
+      "new_rows": 697,
+      "new_phishing": 299,
+      "cumulative_rows": 27667,
+      "cumulative_phishing": 19034,
+      "cumulative_domains": 11570,
+      "by_source": {
+        "openphish": 299,
+        "tranco_templated": 267,
+        "commoncrawl": 131
       }
     }
   ],
