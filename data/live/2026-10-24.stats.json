@@ -1,0 +1,12 @@
+{
+  "date": "2026-10-24",
+  "openphish": 300,
+  "urlhaus_error": "410 Client Error: Gone for url: https://urlhaus.abuse.ch/downloads/csv_recent/",
+  "cc_errors": {
+    "504": 17,
+    "404": 7
+  },
+  "benign_realistic": 277,
+  "benign_templated": 300,
+  "rows": 839
+}
